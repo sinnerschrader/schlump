@@ -10,7 +10,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "commitmsg": "conventional-changelog-lint -e",
     "release": "standard-version --no-verify",
-    "postrelease": "git push --follow-tags origin master && npm publish"
+    "postrelease": "git push --follow-tags origin master && npm publish",
+    "site": "./cli.js --src ./site --dest ./docs"
   },
   "repository": {
     "type": "git",
@@ -37,6 +38,7 @@
   "homepage": "https://github.com/sinnerschrader/schlump#readme",
   "dependencies": {
     "babel-core": "^6.14.0",
+    "babel-plugin-transform-react-jsx": "^6.8.0",
     "camelcase": "^3.0.0",
     "globby": "^6.0.0",
     "gray-matter": "^2.0.2",
