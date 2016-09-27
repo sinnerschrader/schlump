@@ -82,5 +82,5 @@ route: /index.html
 ```
 
 ---
-paeckchen is built with JavaScript and :heart: and released under the
+schlump is built with JavaScript and :heart: and released under the
 [MIT](./LICENSE) license.
