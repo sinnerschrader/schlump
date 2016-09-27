@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const vm = require('vm');
 const path = require('path');
 const globby = require('globby');
@@ -8,42 +7,9 @@ const uppercaseFirst = require('upper-case-first');
 const babel = require('babel-core');
 const React = require('react');
 const ReactDOM = require('react-dom/server');
-const semver = require('semver');
 const matter = require('gray-matter');
-const meow = require('meow');
 
-if (!semver.satisfies(process.version, '>=6')) {
-	console.error('At least node 6 is required');
-	process.exit(1); // eslint-disable-line xo/no-process-exit
-}
-
-const cli = meow(`
-	Usage
-		$ schlump
-
-	Options
-
-		--help           Usage information
-		--src            Source folder (defaults to src)
-		--src-pages      Folder to look for pages (default to <src>/pages)
-		--src-templates  Folder to look for templates (defaults to <src>/templates)
-		--src-statics    Folder to look for static files (defaults to <src>/statics)
-		--dest           Destination folder (defaults to dist)
-		--dest-statics    Folder to write statics (defaults to <dest>/statics)
-`, {});
-if (cli.flags.help) {
-	cli.showHelp();
-	process.exit(0); // eslint-disable-line xo/no-process-exit
-}
-
-const src = cli.flags.src || 'src';
-const srcPages = (cli.flags.srcPages || `${src}/pages`) + '/**/*.html';
-const srcTemplates = (cli.flags.srcTemplates || `${src}/templates`) + '/**/*.html';
-const srcStatics = cli.flags.srcStatics || `${src}/statics`;
-const dest = cli.flags.dest || 'dist';
-const destStatics = cli.flags.destStatics || `${dest}/statics`;
-
-function getDestinationPath(filepath) {
+function getDestinationPath(filepath, dest) {
 	let destinationpath = path.join(dest, filepath.replace(/src\/pages/, ''));
 	if (!path.extname(destinationpath)) {
 		destinationpath += '/index.html';
@@ -82,7 +48,7 @@ function createReactComponent(lazyComponentRegistry, filepath, code) {
 	};
 }
 
-function createReactComponents() {
+function createReactComponents(srcTemplates) {
 	// Create component object here and add all components when created to have the reference already and
 	// resolve against it during runtime
 	const lazyComponentRegistry = {};
@@ -101,15 +67,15 @@ function createReactComponents() {
 		});
 }
 
-function renderPages(filepaths, components) {
+function renderPages(filepaths, components, dest) {
 	console.log(`Generating pages...`);
 	return Promise.all(filepaths.map(filepath => {
-		console.log(`... ${filepath}`);
-		let meta;
+		let destinationPath;
 		return sander.readFile(filepath)
 			.then(content => {
 				const parsed = matter(content.toString());
-				meta = parsed.data;
+				destinationPath = getDestinationPath(parsed.data.route || filepath, dest);
+				console.log(`... ${filepath} -> ${destinationPath}`);
 				const sandbox = Object.assign(
 					{},
 					components,
@@ -121,7 +87,7 @@ function renderPages(filepaths, components) {
 				vm.runInNewContext('__html__ = ' + transformJsx(parsed.content), sandbox);
 				return '<!DOCTYPE html>' + ReactDOM.renderToStaticMarkup(sandbox.__html__);
 			})
-			.then(html => sander.writeFile(getDestinationPath(meta.route || filepath), html));
+			.then(html => sander.writeFile(destinationPath, html));
 	}));
 }
 
@@ -130,12 +96,17 @@ function logError(err) {
 	throw err;
 }
 
-console.log('a', srcPages);
+function build(opts) {
+	const {srcPages, srcTemplates, srcStatics, dest, destStatics} = opts;
+	return sander.copydir(path.join(process.cwd(), srcStatics)).to(path.join(process.cwd(), destStatics))
+		.then(() => createReactComponents(srcTemplates))
+		.then(components =>
+			globby([srcPages])
+				.then(filepaths => renderPages(filepaths, components, dest))
+		.then(() => console.log('Done.')))
+		.catch(err => logError(err));
+}
 
-sander.copydir(path.join(process.cwd(), srcStatics)).to(path.join(process.cwd(), destStatics))
-	.then(() => createReactComponents())
-	.then(components =>
-		globby([srcPages])
-			.then(filepaths => renderPages(filepaths, components))
-	.then(() => console.log('Done.')))
-	.catch(err => logError(err));
+module.exports = {
+	build
+};
