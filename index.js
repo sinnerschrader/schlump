@@ -99,6 +99,7 @@ function logError(err) {
 function build(opts) {
 	const {srcPages, srcTemplates, srcStatics, dest, destStatics} = opts;
 	return sander.copydir(path.join(process.cwd(), srcStatics)).to(path.join(process.cwd(), destStatics))
+		.catch(() => {/* just ignore missing statics folder */})
 		.then(() => createReactComponents(srcTemplates))
 		.then(components =>
 			globby([srcPages])

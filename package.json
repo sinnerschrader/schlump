@@ -11,6 +11,7 @@
     "commitmsg": "conventional-changelog-lint -e",
     "release": "standard-version --no-verify",
     "postrelease": "git push --follow-tags origin master && npm publish",
+    "presite": "rimraf ./docs",
     "site": "./cli.js --src ./site --dest ./docs"
   },
   "repository": {
@@ -53,6 +54,7 @@
     "conventional-changelog-lint": "^1.0.1",
     "cz-customizable": "^4.0.0",
     "husky": "^0.11.8",
+    "rimraf": "^2.5.4",
     "standard-version": "^2.4.0",
     "xo": "^0.16.0"
   },
