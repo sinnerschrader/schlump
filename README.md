@@ -36,6 +36,22 @@ The result is written into the dist folder.
 
 ```shell
 ./node_modules/.bin/schlump --help
+
+    A static site generator utilizing reactjs
+  
+    Usage
+    	$ schlump
+  
+    Options
+  
+        --help           Usage information
+        --src            Source folder (defaults to src)
+        --src-pages      Folder to look for pages (default to <src>/pages)
+        --src-templates  Folder to look for templates (defaults to <src>/templates)
+        --src-statics    Folder to look for static files (defaults to <src>/statics)
+        --dest           Destination folder (defaults to dist)
+        --dest-statics    Folder to write statics (defaults to <dest>/statics)
+
 ```
 
 ## Templates
