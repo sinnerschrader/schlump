@@ -8,6 +8,7 @@
   "main": "./index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "commitmsg": "conventional-changelog-lint -e",
     "release": "standard-version",
     "postrelease": "git push --follow-tags origin master && npm publish"
   },
