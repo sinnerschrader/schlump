@@ -47,7 +47,18 @@
     "upper-case-first": "^1.1.2"
   },
   "devDependencies": {
+    "conventional-changelog-lint": "^1.0.1",
+    "cz-customizable": "^4.0.0",
+    "husky": "^0.11.8",
     "standard-version": "^2.4.0",
     "xo": "^0.16.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-customizable"
+    },
+    "cz-customizable": {
+      "config": "./.cz-config.js"
+    }
   }
 }
