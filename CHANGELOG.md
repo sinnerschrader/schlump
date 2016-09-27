@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.5.3"></a>
+## [0.5.3](https://github.com/sinnerschrader/schlump/compare/v0.5.2...v0.5.3) (2016-09-27)
+
+
+### Bug Fixes
+
+* do not fail if no statics available ([61e52be](https://github.com/sinnerschrader/schlump/commit/61e52be))
+
+
+
 <a name="0.5.2"></a>
 ## [0.5.2](https://github.com/sinnerschrader/schlump/compare/v0.5.1...v0.5.2) (2016-09-27)
 
