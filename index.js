@@ -39,9 +39,8 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 			if (lazyComponentRegistry[name]) {
 				return lazyComponentRegistry[name];
 			}
-			// Check if we have a helper function with this name
-			if (name in helpers && typeof helpers[name] === 'function') {
-				return helpers[name];
+			if (name === 'helpers') {
+				return helpers;
 			}
 			return target[name];
 		}

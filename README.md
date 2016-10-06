@@ -102,7 +102,7 @@ This results in a helper which could be called in a template like this:
 
 ```
 <div>
-    {helloWorld()}
+    {helpers.helloWorld()}
 </div>
 ```
 
