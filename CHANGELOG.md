@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.7.0"></a>
+# [0.7.0](https://github.com/sinnerschrader/schlump/compare/v0.6.1...v0.7.0) (2016-10-06)
+
+
+### Features
+
+* add pages frontmatter to rendering process ([51e4cb8](https://github.com/sinnerschrader/schlump/commit/51e4cb8))
+
+
+
 <a name="0.6.1"></a>
 ## [0.6.1](https://github.com/sinnerschrader/schlump/compare/v0.6.0...v0.6.1) (2016-10-06)
 
