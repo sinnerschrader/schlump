@@ -19,6 +19,7 @@ const cli = meow(`
 		--src-pages      Folder to look for pages (default to <src>/pages)
 		--src-templates  Folder to look for templates (defaults to <src>/templates)
 		--src-statics    Folder to look for static files (defaults to <src>/statics)
+		--src-helpers    Folder to look for helper functions (defaults to <src>/helpers)
 		--dest           Destination folder (defaults to dist)
 		--dest-statics    Folder to write statics (defaults to <dest>/statics)
 `, {});
@@ -34,6 +35,7 @@ function main(flags) {
 		srcPages: (flags.srcPages || `${src}/pages`) + '/**/*.html',
 		srcTemplates: (flags.srcTemplates || `${src}/templates`) + '/**/*.html',
 		srcStatics: flags.srcStatics || `${src}/statics`,
+		srcHelpers: flags.srcHelpers || `${src}/helpers`,
 		dest,
 		destStatics: flags.destStatics || `${dest}/statics`
 	};
