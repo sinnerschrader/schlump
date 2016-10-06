@@ -56,10 +56,25 @@ The result is written into the dist folder.
 
 ```
 
+## Pages
+
+Pages in schlump are JSX files (only the JSX code without JavaScript boilerplate).
+All pages are stateless function components which could have a frontmatter preamble.
+The frontmatter could contain a route entry to specify the URL of the page to create.
+All other frontmatter data is given to the page under the scope `frontmatter`.
+
+```
+---
+route: /index.html
+text: Content!
+---
+<p>{frontmatter.text}</p>
+```
+
 ## Templates
 
-Templates for schlump are JSX files (only the JSX code without JavaScript boilerplate). All components are stateless
-function components. The templates could have a frontmatter preamble.  
+Templates for schlump are JSX files (only the JSX code without JavaScript boilerplate).
+All templates are stateless function components which could have as well a frontmatter preamble.  
 The component name is either given in frontmatter as name or derived from the file name.
 
 For example in a file named `src/templates/my-component.html`:
@@ -74,14 +89,10 @@ name: MyComponent
 ```
 
 This template (component) could then be used in a page with the name `MyComponent`.
-Pages could also have a frontmatter preamble which could contain a route entry to specify the URL of the page to create.
 
 For example in a file named `src/pages/index.html`:
 
 ```
----
-route: /index.html
----
 <MyComponent message="Hello World!" />
 ```
 

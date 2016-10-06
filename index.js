@@ -104,6 +104,7 @@ function renderPages(filepaths, components, dest) {
 					components,
 					{
 						React,
+						frontmatter: parsed.data,
 						__html__: undefined
 					}
 				);
