@@ -9,6 +9,8 @@ const React = require('react');
 const ReactDOM = require('react-dom/server');
 const matter = require('gray-matter');
 const requireAll = require('require-all');
+const chalk = require('chalk');
+const figures = require('figures');
 
 function getDestinationPath(filepath, dest) {
 	let destinationpath = path.join(dest, filepath.replace(/src\/pages/, ''));
@@ -51,7 +53,11 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 	};
 
 	const sandbox = new Proxy(proxyTarget, proxyHandler);
-	vm.runInNewContext(`${name} = (props) => (${compCode})`, sandbox);
+	const opts = {
+		filename: filepath,
+		displayErrors: true
+	};
+	vm.runInNewContext(`${name} = (props) => (${compCode})`, sandbox, opts);
 
 	return {
 		name,
@@ -63,10 +69,21 @@ function loadHelpers(srcHelpers) {
 	if (!sander.existsSync(srcHelpers)) {
 		return {};
 	}
-	return requireAll({
+	console.log(`Loading helpers...`);
+	const plainHelpers = requireAll({
 		dirname: path.resolve(srcHelpers),
 		map: name => name.replace(/-([a-z])/g, (m, c) => c.toUpperCase())
 	});
+	const helpers = Object.keys(plainHelpers).reduce((helpers, name) => {
+		if (typeof plainHelpers[name] === 'function') {
+			console.log(`  ${chalk.bold.green(figures.tick)} ${name} - ok`);
+			helpers[name] = plainHelpers[name];
+		} else {
+			console.log(`  ${chalk.bold.red(figures.cross)} ${name} - does not export a function`);
+		}
+		return helpers;
+	}, {});
+	return helpers;
 }
 
 function createReactComponents(srcTemplates, srcHelpers) {
@@ -91,14 +108,13 @@ function createReactComponents(srcTemplates, srcHelpers) {
 }
 
 function renderPages(filepaths, components, dest) {
-	console.log(`Generating pages...`);
+	console.log(`\nGenerating pages...`);
 	return Promise.all(filepaths.map(filepath => {
 		let destinationPath;
 		return sander.readFile(filepath)
 			.then(content => {
 				const parsed = matter(content.toString());
 				destinationPath = getDestinationPath(parsed.data.route || filepath, dest);
-				console.log(`... ${filepath} -> ${destinationPath}`);
 				const sandbox = Object.assign(
 					{},
 					components,
@@ -108,14 +124,20 @@ function renderPages(filepaths, components, dest) {
 						__html__: undefined
 					}
 				);
-				vm.runInNewContext('__html__ = ' + transformJsx(parsed.content), sandbox);
+				const opts = {
+					filename: filepath,
+					displayErrors: true
+				};
+				vm.runInNewContext('__html__ = ' + transformJsx(parsed.content), sandbox, opts);
 				return '<!DOCTYPE html>' + ReactDOM.renderToStaticMarkup(sandbox.__html__);
 			})
-			.then(html => sander.writeFile(destinationPath, html));
+			.then(html => sander.writeFile(destinationPath, html))
+			.then(() => console.log(`  ${chalk.bold.green(figures.tick)} ${filepath} -> ${destinationPath}`));
 	}));
 }
 
 function logError(err) {
+	console.error(`\n${chalk.bold.red('FAILED')}\n`);
 	console.error(err);
 	throw err;
 }
@@ -128,7 +150,7 @@ function build(opts) {
 		.then(components =>
 			globby([srcPages])
 				.then(filepaths => renderPages(filepaths, components, dest))
-		.then(() => console.log('Done.')))
+		.then(() => console.log(`\n${chalk.bold.green('SUCCESS')}\n`)))
 		.catch(err => logError(err));
 }
 
