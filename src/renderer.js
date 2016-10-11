@@ -8,6 +8,7 @@ const chalk = require('chalk');
 const figures = require('figures');
 
 const {transformJsx} = require('./jsx');
+const {validatePages} = require('./validator');
 
 module.exports = {
 	renderPages
@@ -21,6 +22,14 @@ function getDestinationPath(filepath, dest) {
 	return destinationpath;
 }
 
+/**
+ * Renders all given pages as static HTML into the destination folder.
+ *
+ * @param {string[]} filepaths
+ * @param {any} components
+ * @param {string} dest
+ * @returns
+ */
 function renderPages(filepaths, components, dest) {
 	console.log(`\nGenerating pages...`);
 	return Promise.all(filepaths.map(filepath => {
@@ -46,6 +55,8 @@ function renderPages(filepaths, components, dest) {
 				return '<!DOCTYPE html>' + ReactDOM.renderToStaticMarkup(sandbox.__html__);
 			})
 			.then(html => sander.writeFile(destinationPath, html))
-			.then(() => console.log(`  ${chalk.bold.green(figures.tick)} ${filepath} -> ${destinationPath}`));
-	}));
+			.then(() => console.log(`  ${chalk.bold.green(figures.tick)} ${filepath} -> ${destinationPath}`))
+			.then(() => destinationPath);
+	}))
+	.then(files => validatePages(dest, files));
 }

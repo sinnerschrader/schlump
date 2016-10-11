@@ -46,12 +46,14 @@
     "figures": "^1.7.0",
     "globby": "^6.0.0",
     "gray-matter": "^2.0.2",
+    "htmlparser": "^1.7.7",
     "meow": "^3.7.0",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "require-all": "^2.0.0",
     "sander": "^0.5.1",
     "semver": "^5.3.0",
+    "soupselect": "^0.2.0",
     "upper-case-first": "^1.1.2"
   },
   "devDependencies": {
