@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.8.0"></a>
+# [0.8.0](https://github.com/sinnerschrader/schlump/compare/v0.7.1...v0.8.0) (2016-10-11)
+
+
+### Features
+
+* validate links in generated pages ([55c5950](https://github.com/sinnerschrader/schlump/commit/55c5950))
+
+
+
 <a name="0.7.1"></a>
 ## [0.7.1](https://github.com/sinnerschrader/schlump/compare/v0.7.0...v0.7.1) (2016-10-07)
 
