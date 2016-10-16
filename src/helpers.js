@@ -8,23 +8,29 @@ module.exports = {
 	loadHelpers
 };
 
+const TICK = chalk.bold.green(figures.tick);
+const CROSS = chalk.bold.red(figures.cross);
+
 function loadHelpers(srcHelpers) {
 	if (!sander.existsSync(srcHelpers)) {
 		return {};
 	}
 	console.log(`Loading helpers...`);
-	const plainHelpers = requireAll({
+	const helpers = requireAll({
 		dirname: path.resolve(srcHelpers),
 		map: name => name.replace(/-([a-z])/g, (m, c) => c.toUpperCase())
 	});
-	const helpers = Object.keys(plainHelpers).reduce((helpers, name) => {
+	return validateHelpers(helpers);
+}
+
+function validateHelpers(plainHelpers) {
+	return Object.keys(plainHelpers).reduce((helpers, name) => {
 		if (typeof plainHelpers[name] === 'function') {
-			console.log(`  ${chalk.bold.green(figures.tick)} ${name} - ok`);
+			console.log(`  ${TICK} ${name} - ok`);
 			helpers[name] = plainHelpers[name];
 		} else {
-			console.log(`  ${chalk.bold.red(figures.cross)} ${name} - does not export a function`);
+			console.log(`  ${CROSS} ${name} - does not export a function`);
 		}
 		return helpers;
 	}, {});
-	return helpers;
 }
