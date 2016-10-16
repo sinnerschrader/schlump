@@ -8,7 +8,7 @@ const React = require('react');
 const matter = require('gray-matter');
 
 const {loadHelpers} = require('./helpers');
-const {transformJsx} = require('./jsx');
+const {transformJsx, evaluateHelpers} = require('./jsx');
 
 module.exports = {
 	createReactComponents
@@ -38,7 +38,7 @@ function createReactComponents(srcTemplates, srcHelpers) {
 function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 	const parsed = matter(code);
 	const name = parsed.data.name || uppercaseFirst(camelcase(path.basename(filepath, '.html')));
-	const compCode = transformJsx(parsed.content);
+	const {helpers: jsxHelpers, statement} = transformJsx(parsed.content);
 
 	const proxyHandler = {
 		/*
@@ -55,17 +55,20 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 			return target[name];
 		}
 	};
-	const proxyTarget = {
-		React,
-		name: undefined
-	};
+	const proxyTarget = Object.assign(
+		{
+			React,
+			name: undefined
+		},
+		evaluateHelpers(jsxHelpers)
+	);
 
 	const sandbox = new Proxy(proxyTarget, proxyHandler);
 	const opts = {
 		filename: filepath,
 		displayErrors: true
 	};
-	vm.runInNewContext(`${name} = (props) => (${compCode})`, sandbox, opts);
+	vm.runInNewContext(`${name} = (props) => (${statement})`, sandbox, opts);
 
 	return {
 		name,

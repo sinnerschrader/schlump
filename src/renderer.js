@@ -7,7 +7,7 @@ const matter = require('gray-matter');
 const chalk = require('chalk');
 const figures = require('figures');
 
-const {transformJsx} = require('./jsx');
+const {transformJsx, evaluateHelpers} = require('./jsx');
 const {validatePages} = require('./validator');
 
 module.exports = {
@@ -38,9 +38,11 @@ function renderPages(filepaths, components, dest) {
 			.then(content => {
 				const parsed = matter(content.toString());
 				destinationPath = getDestinationPath(parsed.data.route || filepath, dest);
+				const {helpers, statement} = transformJsx(parsed.content);
 				const sandbox = Object.assign(
 					{},
 					components,
+					evaluateHelpers(helpers),
 					{
 						React,
 						frontmatter: parsed.data,
@@ -51,7 +53,7 @@ function renderPages(filepaths, components, dest) {
 					filename: filepath,
 					displayErrors: true
 				};
-				vm.runInNewContext('__html__ = ' + transformJsx(parsed.content), sandbox, opts);
+				vm.runInNewContext('__html__ = ' + statement, sandbox, opts);
 				return '<!DOCTYPE html>' + ReactDOM.renderToStaticMarkup(sandbox.__html__);
 			})
 			.then(html => sander.writeFile(destinationPath, html))
