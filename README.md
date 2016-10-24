@@ -1,7 +1,7 @@
 # schlump
 
-[![license](https://img.shields.io/github/license/sinnerschrader/schlump.svg?maxAge=2592000)](https://github.com/sinnerschrader/schlump/blob/master/LICENSE)
-[![npm](https://img.shields.io/npm/v/schlump.svg?maxAge=2592000)](https://www.npmjs.com/package/schlump)
+[![license](https://img.shields.io/github/license/sinnerschrader/schlump.svg)](https://github.com/sinnerschrader/schlump/blob/master/LICENSE)
+[![npm](https://img.shields.io/npm/v/schlump.svg)](https://www.npmjs.com/package/schlump)
 [![dependencies Status](https://david-dm.org/sinnerschrader/schlump/status.svg)](https://david-dm.org/sinnerschrader/schlump)
 [![devDependencies Status](https://david-dm.org/sinnerschrader/schlump/dev-status.svg)](https://david-dm.org/sinnerschrader/schlump?type=dev)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
