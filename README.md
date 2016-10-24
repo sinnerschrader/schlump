@@ -38,21 +38,21 @@ The result is written into the dist folder.
 ```shell
 ./node_modules/.bin/schlump --help
 
-    A static site generator utilizing reactjs
-  
     Usage
-    	$ schlump
-  
+        $ schlump
+
     Options
-  
-        --help           Usage information
-        --src            Source folder (defaults to src)
-        --src-pages      Folder to look for pages (default to <src>/pages)
-        --src-templates  Folder to look for templates (defaults to <src>/templates)
-        --src-statics    Folder to look for static files (defaults to <src>/statics)
-        --src-helpers    Folder to look for helper functions (defaults to <src>/helpers)
-        --dest           Destination folder (defaults to dist)
-        --dest-statics    Folder to write statics (defaults to <dest>/statics)
+
+        --help, -h           Usage information
+        --src                Source folder (defaults to src)
+        --src-pages          Folder to look for pages (default to <src>/pages)
+        --src-templates      Folder to look for templates (defaults to <src>/templates)
+        --src-statics        Folder to look for static files (defaults to <src>/statics)
+        --src-helpers        Folder to look for helper functions (defaults to <src>/helpers)
+        --dest               Destination folder (defaults to dist)
+        --dest-statics       Folder to write statics (defaults to <dest>/statics)
+
+        --var.<name>=<value> Define global properties which are usable during build pages
 
 ```
 
@@ -118,6 +118,22 @@ This results in a helper which could be called in a template like this:
 ```
 
 **Note**: The helpers are only availalbe in templates, **NOT** in pages.
+
+## Globals
+
+Global variables which are available in all pages. These values are scoped under
+namespace `global`.
+
+If schlump is executed with `schlump --var.foo=bar` and the following page:
+
+```
+<div>
+    {global.foo}
+</div>
+```
+
+this html is rendered as result: `<div>bar</div>`.
+
 
 ---
 schlump is built with JavaScript and :heart: and released under the
