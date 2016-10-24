@@ -45,10 +45,10 @@ function renderPages(filepaths, components, dest, vars) {
 					components,
 					evaluateHelpers(helpers),
 					{
-						React,
+						global: vars,
 						frontmatter: parsed.data,
-						__html__: undefined,
-						global: vars
+						React,
+						__html__: undefined
 					}
 				);
 				const opts = {
