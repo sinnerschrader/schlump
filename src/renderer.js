@@ -28,9 +28,10 @@ function getDestinationPath(filepath, dest) {
  * @param {string[]} filepaths
  * @param {any} components
  * @param {string} dest
+ * @param {any} vars key-value pairs of globals
  * @returns
  */
-function renderPages(filepaths, components, dest) {
+function renderPages(filepaths, components, dest, vars) {
 	console.log(`\nGenerating pages...`);
 	return Promise.all(filepaths.map(filepath => {
 		let destinationPath;
@@ -46,7 +47,8 @@ function renderPages(filepaths, components, dest) {
 					{
 						React,
 						frontmatter: parsed.data,
-						__html__: undefined
+						__html__: undefined,
+						global: vars
 					}
 				);
 				const opts = {

@@ -23,12 +23,12 @@ function logResult(promise) {
 }
 
 function build(opts) {
-	const {srcPages, srcTemplates, srcStatics, srcHelpers, dest, destStatics} = opts;
+	const {srcPages, srcTemplates, srcStatics, srcHelpers, dest, destStatics, vars} = opts;
 	const promise =
 		sander.copydir(path.join(process.cwd(), srcStatics)).to(path.join(process.cwd(), destStatics))
 			.catch(() => {/* just ignore missing statics folder */})
 			.then(() => createReactComponents(srcTemplates, srcHelpers))
 			.then(components => globby([srcPages]).then(filepaths => [components, filepaths]))
-			.then(([components, filepaths]) => renderPages(filepaths, components, dest));
+			.then(([components, filepaths]) => renderPages(filepaths, components, dest, vars));
 	return logResult(promise);
 }
