@@ -2,6 +2,7 @@ const path = require('path');
 const sander = require('sander');
 const htmlparser = require('htmlparser');
 const {select} = require('soupselect');
+const css = require('css');
 
 module.exports = {
 	validatePages
@@ -53,6 +54,7 @@ function checkAnchor(dom, sourcefile, destinationPath, files) {
 
 function checkStatics(dom, sourcefile, destinationPath, files) {
 	const validatablePathlike = pathlike =>
+		Boolean(pathlike) &&
 		!pathlike.startsWith('http://') &&
 		!pathlike.startsWith('https://') &&
 		!pathlike.startsWith('//');
@@ -76,8 +78,23 @@ function checkStatics(dom, sourcefile, destinationPath, files) {
 			}
 		});
 
+	validate(select(dom, '[style]'), 'inline style', element =>
+		getInlineStyleBackgroundImage(css.parse(`inline { ${element.attribs.style} }`)));
 	validate(select(dom, 'img[src]'), 'image src', image => image.attribs.src);
 	validate(select(dom, 'img[srcset]'), 'image srcset', image =>
 		image.attribs.srcset.split(',').map(src => src.substr(0, src.lastIndexOf(' ')).trim()));
 	validate(select(dom, 'link[href]'), 'link href', link => link.attribs.href);
+}
+
+function getInlineStyleBackgroundImage(ast) {
+	const backgroundImages = ast
+		.stylesheet.rules[0].declarations
+		.filter(declaration => declaration.property === 'background-image');
+	if (backgroundImages.length > 0) {
+		const match = backgroundImages[0].value.match(/url\(['"]?([^)]+)['"]?\)/);
+		if (match.length > 0) {
+			return match[1];
+		}
+	}
+	return undefined;
 }
