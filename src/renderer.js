@@ -26,13 +26,15 @@ function getDestinationPath(filepath, dest) {
 /**
  * Renders all given pages as static HTML into the destination folder.
  *
- * @param {string[]} filepaths
- * @param {any} components
- * @param {string} dest
- * @param {any} vars key-value pairs of globals
+ * @param {string[]} filepaths Input files to generate
+ * @param {string} dest Path to write files to
+ * @param {any} {components, vars, statics}
+ *                 components
+ *                 vars key-value pairs of globals
+ *                 statics list of all available static files
  * @returns
  */
-function renderPages(filepaths, components, dest, vars) {
+function renderPages(filepaths, dest, {components, vars, statics}) {
 	console.log(`\nGenerating pages...`);
 	return Promise.all(filepaths.map(filepath => {
 		let destinationPath;
@@ -70,5 +72,5 @@ function renderPages(filepaths, components, dest, vars) {
 			.then(() => console.log(`  ${chalk.bold.green(figures.tick)} ${filepath} -> ${destinationPath}`))
 			.then(() => destinationPath);
 	}))
-	.then(files => validatePages(dest, files));
+	.then(files => validatePages(dest, files, statics));
 }

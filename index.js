@@ -29,6 +29,9 @@ function build(opts) {
 			.catch(() => {/* just ignore missing statics folder */})
 			.then(() => createReactComponents(srcTemplates, srcHelpers))
 			.then(components => globby([srcPages]).then(filepaths => [components, filepaths]))
-			.then(([components, filepaths]) => renderPages(filepaths, components, dest, vars));
+			.then(([components, filepaths]) => globby([path.join(destStatics, '**')])
+				.then(statics => [components, filepaths, statics]))
+			.then(([components, filepaths, statics]) =>
+				renderPages(filepaths, dest, {components, vars, statics}));
 	return logResult(promise);
 }
