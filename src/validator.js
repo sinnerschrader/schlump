@@ -54,7 +54,8 @@ function checkAnchor(dom, sourcefile, destinationPath, files) {
 function checkStatics(dom, sourcefile, destinationPath, files) {
 	const validatableImage = image =>
 		!image.attribs.src.startsWith('http://') &&
-		!image.attribs.src.startsWith('https://');
+		!image.attribs.src.startsWith('https://') &&
+		!image.attribs.src.startsWith('//');
 
 	const images = select(dom, 'img[src]');
 	images
