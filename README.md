@@ -7,7 +7,10 @@
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Standard Version](https://img.shields.io/badge/release-standard%20version-brightgreen.svg)](https://github.com/conventional-changelog/standard-version)
 
-A static site generator utilizing reactjs
+A static site generator utilizing reactjs.
+
+schlump generates html and copies your static resources into a give folder structure. Aftewards the generated html
+is validated for consistency.
 
 ## Installation
 
@@ -131,6 +134,15 @@ If schlump is executed with `schlump --var.foo=bar` and the following page:
 
 this html is rendered as result: `<div>bar</div>`.
 
+## Validation
+
+Currently the following elements get validated:
+
+* a[href] - relative links to pages must exist (no dead links)
+* img[src] - relatie image resources must exist
+* img[srcset] - relatie image resources must exist
+* *[style] background-image - relative resources in inline-style background-images must exist
+* link[href] - relative external resources must exist
 
 ---
 schlump is built with JavaScript and :heart: and released under the
