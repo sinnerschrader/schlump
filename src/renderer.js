@@ -6,6 +6,7 @@ const ReactDOM = require('react-dom/server');
 const matter = require('gray-matter');
 const chalk = require('chalk');
 const figures = require('figures');
+const {oneLine} = require('common-tags');
 
 const {transformJsx, evaluateHelpers} = require('./jsx');
 const {validatePages} = require('./validator');
@@ -45,7 +46,14 @@ function renderPages(filepaths, components, dest, vars) {
 					components,
 					evaluateHelpers(helpers),
 					{
-						global: vars,
+						global: new Proxy(Object.assign({}, vars), {
+							get: (target, name) => {
+								console.warn('  ' + oneLine`${chalk.bold.red(figures.warning)} Use of ${chalk.bold(`global.${name}`)}
+									in page ${filepath} is deprecated. Use ${chalk.bold(`props.${name}`)} instead.`);
+								return target[name];
+							}
+						}),
+						props: vars,
 						frontmatter: parsed.data,
 						React,
 						__html__: undefined
