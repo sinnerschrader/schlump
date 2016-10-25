@@ -52,20 +52,32 @@ function checkAnchor(dom, sourcefile, destinationPath, files) {
 }
 
 function checkStatics(dom, sourcefile, destinationPath, files) {
-	const validatableImage = image =>
-		!image.attribs.src.startsWith('http://') &&
-		!image.attribs.src.startsWith('https://') &&
-		!image.attribs.src.startsWith('//');
-
-	const images = select(dom, 'img[src]');
-	images
-		.filter(image => validatableImage(image))
-		.map(image => [image, toPath(image.attribs.src, sourcefile, destinationPath)])
-		.map(([image, filepath]) => [image, extendPath(filepath)])
-		.forEach(([image, filepath]) => {
+	const validatablePathlike = pathlike =>
+		!pathlike.startsWith('http://') &&
+		!pathlike.startsWith('https://') &&
+		!pathlike.startsWith('//');
+	const validate = (list, msg, attribFn) => list
+		.reduce((list, item) => {
+			const attrib = attribFn(item);
+			if (Array.isArray(attrib)) {
+				attrib.forEach(attrib => list.push([item, attrib]));
+			} else {
+				list.push([item, attrib]);
+			}
+			return list;
+		}, [])
+		.filter(([, attrib]) => validatablePathlike(attrib))
+		.map(([item, attrib]) => [item, attrib, toPath(attrib, sourcefile, destinationPath)])
+		.map(([item, attrib, filepath]) => [item, attrib, extendPath(filepath)])
+		.forEach(([, attrib, filepath]) => {
 			if (files.indexOf(filepath) === -1) {
 				const source = path.relative(destinationPath, sourcefile);
-				throw new Error(`Invalid image src to resource '${image.attribs.src}' found in '${source}'.`);
+				throw new Error(`Invalid ${msg} to resource '${attrib}' found in '${source}'.`);
 			}
 		});
+
+	validate(select(dom, 'img[src]'), 'image src', image => image.attribs.src);
+	validate(select(dom, 'img[srcset]'), 'image srcset', image =>
+		image.attribs.srcset.split(',').map(src => src.substr(0, src.lastIndexOf(' ')).trim()));
+	validate(select(dom, 'link[href]'), 'link href', link => link.attribs.href);
 }
