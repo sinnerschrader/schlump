@@ -19,13 +19,11 @@ npm install schlump
 
 Create the following folder structure:
 
-```
-src
-src/pages     <-- place your content here
-src/templates <-- place your page components here
-src/statics   <-- place all static assets here
-src/helpers   <-- place all helper functions here (optional)
-```
+    src
+    src/pages     <-- place your content here
+    src/templates <-- place your page components here
+    src/statics   <-- place all static assets here
+    src/helpers   <-- place all helper functions here (optional)
 
 ```shell
 ./node_modules/.bin/schlump
@@ -121,14 +119,13 @@ This results in a helper which could be called in a template like this:
 
 ## Globals
 
-Global variables which are available in all pages. These values are scoped under
-namespace `global`.
+Global variables which are available in all pages. These values are available as top-level `props`.
 
 If schlump is executed with `schlump --var.foo=bar` and the following page:
 
 ```
 <div>
-    {global.foo}
+    {props.foo}
 </div>
 ```
 
