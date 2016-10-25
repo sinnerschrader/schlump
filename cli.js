@@ -14,16 +14,16 @@ const cli = meow(`
 
 	Options
 
-		--help, -h           Usage information
-		--src                Source folder (defaults to src)
-		--src-pages          Folder to look for pages (default to <src>/pages)
-		--src-templates      Folder to look for templates (defaults to <src>/templates)
-		--src-statics        Folder to look for static files (defaults to <src>/statics)
-		--src-helpers        Folder to look for helper functions (defaults to <src>/helpers)
-		--dest               Destination folder (defaults to dist)
-		--dest-statics       Folder to write statics (defaults to <dest>/statics)
-
-		--var.<name>=<value> Define global properties which are usable during build pages
+		--help, -h             Usage information
+		--src                  Source folder (defaults to src)
+		--src-pages            Folder to look for pages (default to <src>/pages)
+		--src-templates        Folder to look for templates (defaults to <src>/templates)
+		--src-statics          Folder to look for static files (defaults to <src>/statics)
+		--src-helpers          Folder to look for helper functions (defaults to <src>/helpers)
+		--dest                 Destination folder (defaults to dist)
+		--dest-statics         Folder to write statics (defaults to <dest>/statics)
+		--var.<name>=<value>   Define global properties which are usable during build pages
+		--disable-validation   Disable html validation (no link and resource checking)
 `, {
 	alias: {
 		h: 'help'
@@ -40,7 +40,8 @@ function main(flags) {
 		srcHelpers: flags.srcHelpers || `${src}/helpers`,
 		dest,
 		destStatics: flags.destStatics || `${dest}/statics`,
-		vars: flags.var
+		vars: flags.var,
+		disableValidation: flags.disableValidation
 	};
 
 	return build(opts);

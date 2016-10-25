@@ -28,13 +28,14 @@ function getDestinationPath(filepath, dest) {
  *
  * @param {string[]} filepaths Input files to generate
  * @param {string} dest Path to write files to
- * @param {any} {components, vars, statics}
+ * @param {any} {components, vars, statics, disableValidation}
  *                 components
  *                 vars key-value pairs of globals
  *                 statics list of all available static files
+ *                 disableValidation true to disable sanity checks
  * @returns
  */
-function renderPages(filepaths, dest, {components, vars, statics}) {
+function renderPages(filepaths, dest, {components, vars, statics, disableValidation}) {
 	console.log(`\nGenerating pages...`);
 	return Promise.all(filepaths.map(filepath => {
 		let destinationPath;
@@ -72,5 +73,5 @@ function renderPages(filepaths, dest, {components, vars, statics}) {
 			.then(() => console.log(`  ${chalk.bold.green(figures.tick)} ${filepath} -> ${destinationPath}`))
 			.then(() => destinationPath);
 	}))
-	.then(files => validatePages(dest, files, statics));
+	.then(files => disableValidation || validatePages(dest, files, statics));
 }

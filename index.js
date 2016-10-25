@@ -23,7 +23,7 @@ function logResult(promise) {
 }
 
 function build(opts) {
-	const {srcPages, srcTemplates, srcStatics, srcHelpers, dest, destStatics, vars} = opts;
+	const {srcPages, srcTemplates, srcStatics, srcHelpers, dest, destStatics, vars, disableValidation} = opts;
 	const promise =
 		sander.copydir(path.join(process.cwd(), srcStatics)).to(path.join(process.cwd(), destStatics))
 			.catch(() => {/* just ignore missing statics folder */})
@@ -32,6 +32,6 @@ function build(opts) {
 			.then(([components, filepaths]) => globby([path.join(destStatics, '**')])
 				.then(statics => [components, filepaths, statics]))
 			.then(([components, filepaths, statics]) =>
-				renderPages(filepaths, dest, {components, vars, statics}));
+				renderPages(filepaths, dest, {components, vars, statics, disableValidation}));
 	return logResult(promise);
 }
