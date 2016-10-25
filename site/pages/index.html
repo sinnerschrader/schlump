@@ -3,7 +3,9 @@ title: Schlump!
 route: /index.html
 ---
 <Layout {...frontmatter} base=".">
-	<MyComponent message="Hello World!"/>
-	<MyComponent/>
+	<div className="container">
+		<MyComponent message="Hello World!"/>
+		<MyComponent/>
+	</div>
 	<a href="./index2.html">Link to page 2</a>
 </Layout>
