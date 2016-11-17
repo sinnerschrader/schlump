@@ -8,6 +8,9 @@ module.exports = {
 };
 
 function createRedirects(redirectMap, dest) {
+	if (!redirectMap) {
+		return Promise.resolve();
+	}
 	console.log(`\nGenerating redirects...`);
 	return sander.readFile(redirectMap)
 		.then(content => JSON.parse(content))
