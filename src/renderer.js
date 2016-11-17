@@ -12,7 +12,8 @@ const {transformJsx, evaluateHelpers} = require('./jsx');
 const {validatePages} = require('./validator');
 
 module.exports = {
-	renderPages
+	renderPages,
+	getDestinationPath
 };
 
 function getDestinationPath(filepath, dest) {

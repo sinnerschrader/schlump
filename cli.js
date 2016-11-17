@@ -24,6 +24,7 @@ const cli = meow(`
 		--dest-statics         Folder to write statics (defaults to <dest>/statics)
 		--var.<name>=<value>   Define global properties which are usable during build pages
 		--disable-validation   Disable html validation (no link and resource checking)
+		--redirect-map         A json file with key value pairs of url-path (source) and full qualifed urls (target)
 `, {
 	alias: {
 		h: 'help'
@@ -41,7 +42,8 @@ function main(flags) {
 		dest,
 		destStatics: flags.destStatics || `${dest}/statics`,
 		vars: flags.var,
-		disableValidation: flags.disableValidation
+		disableValidation: flags.disableValidation,
+		redirectMap: flags.redirectMap
 	};
 
 	return build(opts);

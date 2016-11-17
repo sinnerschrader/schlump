@@ -54,6 +54,7 @@ The result is written into the dist folder.
         --dest-statics         Folder to write statics (defaults to <dest>/statics)
         --var.<name>=<value>   Define global properties which are usable during build pages
         --disable-validation   Disable html validation (no link and resource checking)
+		--redirect-map         A json file with key value pairs of url-path (source) and full qualifed urls (target)
 
 ```
 
@@ -143,6 +144,19 @@ Currently the following elements get validated:
 * img[srcset] - relatie image resources must exist
 * *[style] background-image - relative resources in inline-style background-images must exist
 * link[href] - relative external resources must exist
+
+## Redirects
+
+Given schlump is started with the parameter `--redirect-map map.json` and map.json contains:
+
+```
+{
+	"/old/page/url": "https://github.com/sinnerschrader/schlump"
+}
+```
+
+then schlump generates a page at `<dest>/old/page/url/index.html` which contains a meta refresh
+to `https://github.com/sinnerschrader/schlump`.
 
 ---
 schlump is built with JavaScript and :heart: and released under the

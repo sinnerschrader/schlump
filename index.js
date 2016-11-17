@@ -5,6 +5,7 @@ const chalk = require('chalk');
 
 const {renderPages} = require('./src/renderer');
 const {createReactComponents} = require('./src/components');
+const {createRedirects} = require('./src/redirects');
 
 module.exports = {
 	build
@@ -23,7 +24,8 @@ function logResult(promise) {
 }
 
 function build(opts) {
-	const {srcPages, srcTemplates, srcStatics, srcHelpers, dest, destStatics, vars, disableValidation} = opts;
+	const {srcPages, srcTemplates, srcStatics, srcHelpers, dest, destStatics, vars, disableValidation,
+		redirectMap} = opts;
 	const promise =
 		sander.copydir(path.join(process.cwd(), srcStatics)).to(path.join(process.cwd(), destStatics))
 			.catch(() => {/* just ignore missing statics folder */})
@@ -32,6 +34,8 @@ function build(opts) {
 			.then(([components, filepaths]) => globby([path.join(destStatics, '**')])
 				.then(statics => [components, filepaths, statics]))
 			.then(([components, filepaths, statics]) =>
-				renderPages(filepaths, dest, {components, vars, statics, disableValidation}));
+				renderPages(filepaths, dest, {components, vars, statics, disableValidation})
+					.then(() => [components, statics]))
+			.then(([components, statics]) => createRedirects(redirectMap, dest, {components, vars, statics, disableValidation}));
 	return logResult(promise);
 }
