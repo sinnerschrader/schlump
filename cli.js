@@ -36,7 +36,7 @@ function main(flags) {
 	const dest = flags.dest || 'dist';
 	const opts = {
 		srcPages: (flags.srcPages || `${src}/pages`) + '/**/*.html',
-		srcTemplates: (flags.srcTemplates || `${src}/templates`) + '/**/*.html',
+		srcTemplates: (flags.srcTemplates || `${src}/templates`) + '/**/*.{html,svg}',
 		srcStatics: flags.srcStatics || `${src}/statics`,
 		srcHelpers: flags.srcHelpers || `${src}/helpers`,
 		dest,
