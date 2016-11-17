@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.13.0"></a>
+# [0.13.0](https://github.com/sinnerschrader/schlump/compare/v0.12.0...v0.13.0) (2016-11-17)
+
+
+### Features
+
+* create redirect pages if option given ([60fd497](https://github.com/sinnerschrader/schlump/commit/60fd497))
+
+
+
 <a name="0.12.0"></a>
 # [0.12.0](https://github.com/sinnerschrader/schlump/compare/v0.11.0...v0.12.0) (2016-10-25)
 
