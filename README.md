@@ -54,7 +54,8 @@ The result is written into the dist folder.
         --dest-statics         Folder to write statics (defaults to <dest>/statics)
         --var.<name>=<value>   Define global properties which are usable during build pages
         --disable-validation   Disable html validation (no link and resource checking)
-		--redirect-map         A json file with key value pairs of url-path (source) and full qualifed urls (target)
+        --redirect-map         A json file with key value pairs of url-path (source) and full qualifed urls (target)
+        --scoped-css           Path of the file to write all scoped css to
 
 ```
 

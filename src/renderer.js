@@ -10,6 +10,7 @@ const {oneLine} = require('common-tags');
 
 const {transformJsx, evaluateHelpers} = require('./jsx');
 const {validatePages} = require('./validator');
+const {createScopedCss, combineCss} = require('./css');
 
 module.exports = {
 	renderPages,
@@ -29,7 +30,7 @@ function getDestinationPath(filepath, dest) {
  *
  * @param {string[]} filepaths Input files to generate
  * @param {string} dest Path to write files to
- * @param {any} {components, vars, statics, disableValidation}
+ * @param {any} {components, vars, statics, disableValidation, scopedCss}
  *                 components
  *                 vars key-value pairs of globals
  *                 statics list of all available static files
@@ -39,41 +40,52 @@ function getDestinationPath(filepath, dest) {
 function renderPages(filepaths, dest, {components, vars, statics, disableValidation}) {
 	console.log(`\nGenerating pages...`);
 	return Promise.all(filepaths.map(filepath => {
-		let destinationPath;
 		return sander.readFile(filepath)
-			.then(content => {
-				const parsed = matter(content.toString());
-				destinationPath = getDestinationPath(parsed.data.route || filepath, dest);
-				const {helpers, statement} = transformJsx(parsed.content);
-				const sandbox = Object.assign(
-					{},
-					components,
-					evaluateHelpers(helpers),
-					{
-						global: new Proxy(Object.assign({}, vars), {
-							get: (target, name) => {
-								console.warn('  ' + oneLine`${chalk.bold.red(figures.warning)} Use of ${chalk.bold(`global.${name}`)}
-									in page ${filepath} is deprecated. Use ${chalk.bold(`props.${name}`)} instead.`);
-								return target[name];
-							}
-						}),
-						props: vars,
-						frontmatter: parsed.data,
-						scopedCss: Object.keys(components).map(name => components[name].css).join('\n').trim(),
-						React,
-						__html__: undefined
-					}
-				);
-				const opts = {
-					filename: filepath,
-					displayErrors: true
-				};
-				vm.runInNewContext('__html__ = ' + statement, sandbox, opts);
-				return '<!DOCTYPE html>' + ReactDOM.renderToStaticMarkup(sandbox.__html__);
-			})
-			.then(html => sander.writeFile(destinationPath, html))
-			.then(() => console.log(`  ${chalk.bold.green(figures.tick)} ${filepath} -> ${destinationPath}`))
-			.then(() => destinationPath);
+			.then(content => renderPage(content, filepath, {components, vars, dest}))
+			.then(([html, destinationPath, scopedCss]) => sander.writeFile(destinationPath, html)
+				.then(() => [destinationPath, scopedCss]))
+			.then(([destinationPath, scopedCss]) => {
+				console.log(`  ${chalk.bold.green(figures.tick)} ${filepath} -> ${destinationPath}`);
+				return [destinationPath, scopedCss];
+			});
 	}))
-	.then(files => disableValidation || validatePages(dest, files, statics));
+	.then(pageResults => disableValidation ||
+		validatePages(dest, pageResults.map(result => result[0]), statics)
+			.then(() => pageResults.map(result => result[1])));
+}
+
+function deprecatedGlobals(target, name, filepath) {
+	console.warn('  ' + oneLine`${chalk.bold.red(figures.warning)} Use of ${chalk.bold(`global.${name}`)}
+		in page ${filepath} is deprecated. Use ${chalk.bold(`props.${name}`)} instead.`);
+	return target[name];
+}
+
+function renderPage(content, filepath, {components, vars, dest}) {
+	const parsed = matter(content.toString());
+	const destinationPath = getDestinationPath(parsed.data.route || filepath, dest);
+	const pageName = filepath.replace(/[./]/g, '-').replace(/^--/, '');
+	const [html, cssom, scopedCss] = createScopedCss(parsed.content, pageName, filepath);
+	const {helpers, statement} = transformJsx(html);
+	const sandbox = Object.assign(
+		{},
+		components,
+		evaluateHelpers(helpers),
+		{
+			global: new Proxy(Object.assign({}, vars), {
+				get: (target, name) => deprecatedGlobals(target, name, filepath)
+			}),
+			props: vars,
+			frontmatter: parsed.data,
+			style: cssom.classNames,
+			scopedCss: combineCss(components, scopedCss),
+			React,
+			__html__: undefined
+		}
+	);
+	const opts = {
+		filename: filepath,
+		displayErrors: true
+	};
+	vm.runInNewContext('__html__ = ' + statement, sandbox, opts);
+	return ['<!DOCTYPE html>' + ReactDOM.renderToStaticMarkup(sandbox.__html__), destinationPath, scopedCss];
 }

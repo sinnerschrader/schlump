@@ -13,7 +13,7 @@
     "release": "standard-version --no-verify",
     "postrelease": "git push --follow-tags origin master && npm publish",
     "presite": "rimraf ./docs",
-    "site": "./cli.js --src ./site --dest ./docs --var.foo=bar"
+    "site": "./cli.js --src ./site --dest ./docs --var.foo=bar --scoped-css=./docs/statics/scoped.css"
   },
   "repository": {
     "type": "git",

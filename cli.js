@@ -25,6 +25,7 @@ const cli = meow(`
 		--var.<name>=<value>   Define global properties which are usable during build pages
 		--disable-validation   Disable html validation (no link and resource checking)
 		--redirect-map         A json file with key value pairs of url-path (source) and full qualifed urls (target)
+		--scoped-css           Path of the file to write all scoped css to
 `, {
 	alias: {
 		h: 'help'
@@ -43,7 +44,8 @@ function main(flags) {
 		destStatics: flags.destStatics || `${dest}/statics`,
 		vars: flags.var,
 		disableValidation: flags.disableValidation,
-		redirectMap: flags.redirectMap
+		redirectMap: flags.redirectMap,
+		scopedCss: flags.scopedCss
 	};
 
 	return build(opts);
