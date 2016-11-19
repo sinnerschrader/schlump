@@ -17,15 +17,18 @@ function createScopedCss(html, name, filepath) {
 	const className = selector => `${decamelize(name, '-')}-${decamelize(camelcase(selector), '-')}`;
 	const cssom = css.parse(style[1], {source: filepath});
 	cssom.classNames = cssom.stylesheet.rules
-		.reduce((rules, rule) => {
-			const result = [...rules, ...rule.selectors];
-			rule.selectors = rule.selectors.map(selector => `.${className(selector)}`);
-			return result;
-		}, [])
-		.reduce((classNames, selector) => {
-			classNames[camelcase(selector)] = className(selector);
-			return classNames;
-		}, {});
+			.reduce((rules, rule) => {
+				if (rule.type !== 'rule') {
+					return rules;
+				}
+				const result = [...rules, ...rule.selectors];
+				rule.selectors = rule.selectors.map(selector => `.${className(selector)}`);
+				return result;
+			}, [])
+			.reduce((classNames, selector) => {
+				classNames[camelcase(selector)] = className(selector);
+				return classNames;
+			}, {});
 	return [html, cssom, css.stringify(cssom)];
 }
 
