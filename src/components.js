@@ -39,7 +39,7 @@ function createReactComponents(srcTemplates, srcHelpers) {
 
 function createScopedCss(style, name, filepath) {
 	if (!style) {
-		return [undefined, undefined];
+		return [{classNames: {}}, ''];
 	}
 	const className = selector => `${decamelize(name, '-')}-${decamelize(camelcase(selector), '-')}`;
 	const cssom = css.parse(style[1], {source: filepath});
@@ -78,16 +78,14 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 			if (name === 'helpers') {
 				return helpers;
 			}
-			if (name === 'style' && cssom) {
-				return cssom.classNames;
-			}
 			return target[name];
 		}
 	};
 	const proxyTarget = Object.assign(
 		{
 			React,
-			name: undefined
+			name: undefined,
+			style: cssom.classNames
 		},
 		evaluateHelpers(jsxHelpers)
 	);
