@@ -7,6 +7,7 @@ const {renderPages} = require('./src/renderer');
 const {createReactComponents} = require('./src/components');
 const {createRedirects} = require('./src/redirects');
 const {combineCss} = require('./src/css');
+const {loadHelpersForClient} = require('./src/helpers');
 
 module.exports = {
 	build
@@ -51,7 +52,9 @@ function build(opts) {
 						return pageResults;
 					})
 					.then(pageResults => {
+						const helpers = loadHelpersForClient(srcHelpers);
 						const code = [
+							...helpers,
 							...Object.keys(components).map(name => components[name].code),
 							...pageResults.map(result => result.pageCode)
 						];

@@ -91,7 +91,7 @@ function renderPage(content, filepath, {components, vars, dest}) {
 	vm.runInNewContext('__html__ = ' + statement, sandbox, opts);
 
 	return [
-		'<!DOCTYPE html>' + ReactDOM.renderToStaticMarkup(sandbox.__html__),
+		'<!DOCTYPE html>' + ReactDOM.renderToString(sandbox.__html__),
 		destinationPath,
 		scopedCss,
 		`${helpers}

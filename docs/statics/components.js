@@ -1,8 +1,12 @@
-window.JsLogo = (props) => (React.createElement("img", {
+helpers = {};
+helpers.loremIpsum = function (text) {
+	return text || 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
+};
+window.JsLogo = (props, style = '[object Object]') => (React.createElement("img", {
   src: props.base + '/statics/js.png',
   width: "50"
 }));
-window.JsLogoSvg = (props) => (React.createElement(
+window.JsLogoSvg = (props, style = '[object Object]') => (React.createElement(
 	"svg",
 	{
 		viewBox: "0 0 612 612"
@@ -23,7 +27,7 @@ window.JsLogoSvg = (props) => (React.createElement(
 		})
 	)
 ));
-window.Layout = (props) => (React.createElement(
+window.Layout = (props, style = '[object Object]') => (React.createElement(
 	"html",
 	null,
 	React.createElement(
@@ -87,12 +91,12 @@ window.Layout = (props) => (React.createElement(
 		})
 	)
 ));
-window.MyComponent = (props) => (React.createElement(
+window.MyComponent = (props, style = '[object Object]') => (React.createElement(
   "div",
   null,
   helpers.loremIpsum(props.message)
 ));
-window.WithStyle = (props) => (React.createElement(
+window.WithStyle = (props, style = '[object Object]') => (React.createElement(
 	"div",
 	{
 		className: style.styledContainer

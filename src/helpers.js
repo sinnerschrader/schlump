@@ -3,9 +3,12 @@ const sander = require('sander');
 const requireAll = require('require-all');
 const chalk = require('chalk');
 const figures = require('figures');
+const globby = require('globby');
+const camelcase = require('camelcase');
 
 module.exports = {
-	loadHelpers
+	loadHelpers,
+	loadHelpersForClient
 };
 
 const TICK = chalk.bold.green(figures.tick);
@@ -33,4 +36,16 @@ function validateHelpers(plainHelpers) {
 		}
 		return helpers;
 	}, {});
+}
+
+function loadHelpersForClient(srcHelpers) {
+	if (!sander.existsSync(srcHelpers)) {
+		return {};
+	}
+	const helpers = loadHelpers(srcHelpers);
+	return Object.keys(helpers)
+		.reduce((code, name) => {
+			code.push(`helpers.${name} = ${helpers[name].toString()};`);
+			return code;
+		}, ['helpers = {};']);
 }
