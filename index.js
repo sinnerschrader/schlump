@@ -43,10 +43,19 @@ function build(opts) {
 				.then(statics => [components, filepaths, statics]))
 			.then(([components, filepaths, statics]) =>
 				renderPages(filepaths, dest, {components, vars, statics, disableValidation, scopedCss})
-					.then(pageStylesheets => {
+					.then(pageResults => {
 						if (scopedCss) {
-							return sander.writeFile(scopedCss, combineCss(components, pageStylesheets));
+							return sander.writeFile(scopedCss, combineCss(components, pageResults.map(result => result.scopedCss)))
+								.then(() => pageResults);
 						}
+						return pageResults;
+					})
+					.then(pageResults => {
+						const code = [
+							...Object.keys(components).map(name => components[name].code),
+							...pageResults.map(result => result.pageCode)
+						];
+						return sander.writeFile('./docs/statics/components.js', code.join('\n'));
 					})
 					.then(() => [components, statics]))
 			.then(([components, statics]) => createRedirects(redirectMap, dest, {components, vars, statics, disableValidation}));

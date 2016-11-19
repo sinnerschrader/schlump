@@ -7,6 +7,8 @@ const matter = require('gray-matter');
 const chalk = require('chalk');
 const figures = require('figures');
 const {oneLine} = require('common-tags');
+const camelcase = require('camelcase');
+const uppercaseFirst = require('upper-case-first');
 
 const {transformJsx, evaluateHelpers} = require('./jsx');
 const {validatePages} = require('./validator');
@@ -42,16 +44,16 @@ function renderPages(filepaths, dest, {components, vars, statics, disableValidat
 	return Promise.all(filepaths.map(filepath => {
 		return sander.readFile(filepath)
 			.then(content => renderPage(content, filepath, {components, vars, dest}))
-			.then(([html, destinationPath, scopedCss]) => sander.writeFile(destinationPath, html)
-				.then(() => [destinationPath, scopedCss]))
-			.then(([destinationPath, scopedCss]) => {
+			.then(([html, destinationPath, scopedCss, pageCode]) => sander.writeFile(destinationPath, html)
+				.then(() => [destinationPath, scopedCss, pageCode]))
+			.then(([destinationPath, scopedCss, pageCode]) => {
 				console.log(`  ${chalk.bold.green(figures.tick)} ${filepath} -> ${destinationPath}`);
-				return [destinationPath, scopedCss];
+				return {destinationPath, scopedCss, pageCode};
 			});
 	}))
 	.then(pageResults => disableValidation ||
-		validatePages(dest, pageResults.map(result => result[0]), statics)
-			.then(() => pageResults.map(result => result[1])));
+		validatePages(dest, pageResults.map(result => result.destinationPath), statics)
+			.then(() => pageResults));
 }
 
 function deprecatedGlobals(target, name, filepath) {
@@ -87,5 +89,14 @@ function renderPage(content, filepath, {components, vars, dest}) {
 		displayErrors: true
 	};
 	vm.runInNewContext('__html__ = ' + statement, sandbox, opts);
-	return ['<!DOCTYPE html>' + ReactDOM.renderToStaticMarkup(sandbox.__html__), destinationPath, scopedCss];
+
+	return [
+		'<!DOCTYPE html>' + ReactDOM.renderToStaticMarkup(sandbox.__html__),
+		destinationPath,
+		scopedCss,
+		`${helpers}
+		window.${uppercaseFirst(camelcase(pageName))} =
+			(props, frontmatter = ${JSON.stringify(parsed.data)}, scopedCss = '${scopedCss.replace(/[\r\n]/g, '').replace(/'/g, '\\')}', style = '${JSON.stringify(cssom.classNames)}') =>
+			(${statement});`
+	];
 }

@@ -70,7 +70,9 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 		filename: filepath,
 		displayErrors: true
 	};
-	vm.runInNewContext(`${name} = (props) => (${statement})`, sandbox, opts);
+	const componentCode = `${name} = (props) => (${statement})`;
+	vm.runInNewContext(componentCode, sandbox, opts);
+	sandbox[name].code = `window.${componentCode};`;
 	sandbox[name].css = scopedCss;
 
 	return {
