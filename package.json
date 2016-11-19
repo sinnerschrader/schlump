@@ -12,8 +12,8 @@
     "commitmsg": "conventional-changelog-lint -e",
     "release": "standard-version --no-verify",
     "postrelease": "git push --follow-tags origin master && npm publish",
-    "presite": "rimraf ./docs/*",
-    "site": "./cli.js --src ./site --dest ./docs --var.foo=bar",
+    "presite": "rimraf ./docs/* && lessc --clean-css ./node_modules/elemental/less/elemental.less docs/statics/elemental.styles.css",
+    "site": "./cli.js --src ./site --dest ./docs --var.foo=bar --template-import='elemental:UI'",
     "site:watch": "chokidar '{index,cli}.js' 'src/**' 'site/**' --initial --command 'npm run site'"
   },
   "repository": {
@@ -64,7 +64,11 @@
     "chokidar-cli": "^1.2.0",
     "conventional-changelog-lint": "^1.0.1",
     "cz-customizable": "^4.0.0",
+    "elemental": "^0.6.1",
     "husky": "^0.11.8",
+    "less": "^2.7.1",
+    "less-plugin-clean-css": "^1.5.1",
+    "react-addons-css-transition-group": "^15.3.2",
     "rimraf": "^2.5.4",
     "standard-version": "^3.0.0",
     "xo": "^0.17.0"

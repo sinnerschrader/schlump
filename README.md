@@ -54,7 +54,9 @@ The result is written into the dist folder.
         --dest-statics         Folder to write statics (defaults to <dest>/statics)
         --var.<name>=<value>   Define global properties which are usable during build pages
         --disable-validation   Disable html validation (no link and resource checking)
-		--redirect-map         A json file with key value pairs of url-path (source) and full qualifed urls (target)
+        --redirect-map         A json file with key value pairs of url-path (source) and full qualifed urls (target)
+        --template-import='<file-or-node-module-path>[:<namespace>]'
+                               Imports the react-components from the given path at the given namespace
 
 ```
 
@@ -65,7 +67,7 @@ All pages are stateless function components which could have a frontmatter pream
 The frontmatter could contain a route entry to specify the URL of the page to create.
 All other frontmatter data is given to the page under the scope `frontmatter`.
 
-```
+```html
 ---
 route: /index.html
 text: Content!
@@ -76,12 +78,13 @@ text: Content!
 ## Templates
 
 Templates for schlump are JSX files (only the JSX code without JavaScript boilerplate).
-All templates are stateless function components which could have as well a frontmatter preamble.  
+All templates are stateless function components which could have as well a frontmatter preamble.
+
 The component name is either given in frontmatter as name or derived from the file name.
 
 For example in a file named `src/templates/my-component.html`:
 
-```
+```html
 ---
 name: MyComponent
 ---
@@ -94,26 +97,26 @@ This template (component) could then be used in a page with the name `MyComponen
 
 For example in a file named `src/pages/index.html`:
 
-```
+```html
 <MyComponent message="Hello World!" />
 ```
 
 ## Helpers
 
-Helpers are functions which could be used in all templates.  
+Helpers are functions which could be used in all templates.
 
 Helpers must export a function at `module.exports`, the name of the helper is deduced from the camel-cased file
-name of the helper function.  
+name of the helper function.
 
 For example in a file named `src/helpers/hello-world.js`:
 
-```
+```js
 module.exports = function () { return 'Hello World!'; };
 ```
 
 This results in a helper which could be called in a template like this:
 
-```
+```html
 <div>
     {helpers.helloWorld()}
 </div>
@@ -127,7 +130,7 @@ Global variables which are available in all pages. These values are available as
 
 If schlump is executed with `schlump --var.foo=bar` and the following page:
 
-```
+```html
 <div>
     {props.foo}
 </div>
@@ -149,14 +152,41 @@ Currently the following elements get validated:
 
 Given schlump is started with the parameter `--redirect-map map.json` and map.json contains:
 
-```
+```json
 {
-	"/old/page/url": "https://github.com/sinnerschrader/schlump"
+  "/old/page/url": "https://github.com/sinnerschrader/schlump"
 }
 ```
 
 then schlump generates a page at `<dest>/old/page/url/index.html` which contains a meta refresh
 to `https://github.com/sinnerschrader/schlump`.
+
+## Template Imports
+
+With the option `--template-import` it is possible to integrate external [React](https://reactjs.com) component
+libraries (e.g. [elemental ui](http://elemental-ui.com/)) into schlump sites.
+
+The libraries are either referenced from node_modules (e.g. `elemental`) or by relative path
+(e.g. `./node_modules/elemental`) and could be imported into an optional given namespace.
+
+```shell
+$ # This would import elemental-ui into the namespace UI
+$ schlump --template-import='elemental:UI'
+```
+
+Afterwards all components of the library could be used with the given namespace.
+
+```html
+<body>
+    <UI.Button/>
+</body>
+```
+
+The option could occurr multiple times on the cli. If there are name clashes in the namespace and module names, the
+last given option overwrites former imports.
+
+If there is no namespace given, then the library is imported into the default schlump component space. But it is not
+possible to overwrite local schlump components by an imported library.
 
 ---
 schlump is built with JavaScript and :heart: and released under the
