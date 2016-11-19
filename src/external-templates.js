@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
 	mixinExternalTemplates
 };
@@ -17,7 +19,9 @@ function importTemplateLibrary(templateImport, components) {
 	const matches = templateImport.match(/([^:]+)(?::(.*))?/);
 	if (matches) {
 		const [, templateImportSource, namespace] = matches;
-		const externalTemplates = require(templateImportSource); // eslint-disable-line import/no-dynamic-require
+		const externalTemplates = require(templateImportSource.startsWith('.') ? // eslint-disable-line import/no-dynamic-require
+			path.resolve(process.cwd(), templateImportSource) :
+			templateImportSource);
 		if (namespace) {
 			components[namespace] = externalTemplates;
 		} else {
