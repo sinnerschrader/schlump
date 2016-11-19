@@ -12,8 +12,9 @@
     "commitmsg": "conventional-changelog-lint -e",
     "release": "standard-version --no-verify",
     "postrelease": "git push --follow-tags origin master && npm publish",
-    "presite": "rimraf ./docs",
-    "site": "./cli.js --src ./site --dest ./docs --var.foo=bar --scoped-css=./docs/statics/scoped.css"
+    "presite": "rimraf ./docs/*",
+    "site": "./cli.js --src ./site --dest ./docs --var.foo=bar --scoped-css=./docs/statics/scoped.css",
+    "site:watch": "chokidar '{index,cli}.js' 'src/**' 'site/**' --initial --command 'npm run site'"
   },
   "repository": {
     "type": "git",
@@ -61,6 +62,7 @@
     "upper-case-first": "^1.1.2"
   },
   "devDependencies": {
+    "chokidar-cli": "^1.2.0",
     "conventional-changelog-lint": "^1.0.1",
     "cz-customizable": "^4.0.0",
     "husky": "^0.11.8",
