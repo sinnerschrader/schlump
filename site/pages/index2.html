@@ -2,7 +2,8 @@
 title: Schlump!
 route: /index2.html
 ---
-<Layout {...frontmatter} base=".">
+<Layout {...frontmatter} base="." scopedCss={scopedCss}>
 	<MyComponent message={'foo=' + props.foo}/>
+	<WithStyle/>
 	<a href="./index.html">Link to page 1</a>
 </Layout>

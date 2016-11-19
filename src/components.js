@@ -3,9 +3,11 @@ const path = require('path');
 const globby = require('globby');
 const sander = require('sander');
 const camelcase = require('camelcase');
+const decamelize = require('decamelize');
 const uppercaseFirst = require('upper-case-first');
 const React = require('react');
 const matter = require('gray-matter');
+const css = require('css');
 
 const {loadHelpers} = require('./helpers');
 const {transformJsx, evaluateHelpers} = require('./jsx');
@@ -35,10 +37,34 @@ function createReactComponents(srcTemplates, srcHelpers) {
 		});
 }
 
+function createScopedCss(style, name, filepath) {
+	if (!style) {
+		return [undefined, undefined];
+	}
+	const className = selector => `${decamelize(name, '-')}-${decamelize(camelcase(selector), '-')}`;
+	const cssom = css.parse(style[1], {source: filepath});
+	cssom.classNames = cssom.stylesheet.rules
+		.reduce((rules, rule) => {
+			const result = [...rules, ...rule.selectors];
+			rule.selectors = rule.selectors.map(selector => `.${className(selector)}`);
+			return result;
+		}, [])
+		.reduce((classNames, selector) => {
+			classNames[camelcase(selector)] = className(selector);
+			return classNames;
+		}, {});
+	return [cssom, css.stringify(cssom)];
+}
+
 function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 	const parsed = matter(code);
 	const name = parsed.data.name || uppercaseFirst(camelcase(path.basename(filepath, '.html')));
-	const {helpers: jsxHelpers, statement} = transformJsx(parsed.content);
+
+	const styleMatcher = /^<style(?:.+)scoped(?:.*)>((?:.|[\r\n])*)<\/style>/i;
+	const style = parsed.content.match(styleMatcher);
+	const [cssom, scopedCss] = createScopedCss(style, name, filepath);
+
+	const {helpers: jsxHelpers, statement} = transformJsx(parsed.content.replace(styleMatcher, ''));
 
 	const proxyHandler = {
 		/*
@@ -51,6 +77,9 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 			}
 			if (name === 'helpers') {
 				return helpers;
+			}
+			if (name === 'style' && cssom) {
+				return cssom.classNames;
 			}
 			return target[name];
 		}
@@ -69,6 +98,7 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 		displayErrors: true
 	};
 	vm.runInNewContext(`${name} = (props) => (${statement})`, sandbox, opts);
+	sandbox[name].css = scopedCss;
 
 	return {
 		name,

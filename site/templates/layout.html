@@ -5,6 +5,9 @@ name: Layout
 <head>
 	<title>{props.title}</title>
 	<link href="./statics/site.css" rel="stylesheet"/>
+	<style type="text/css">
+		{props.scopedCss}
+	</style>
 </head>
 <body>
 	<div className="content">

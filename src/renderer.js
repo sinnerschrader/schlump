@@ -59,6 +59,7 @@ function renderPages(filepaths, dest, {components, vars, statics, disableValidat
 						}),
 						props: vars,
 						frontmatter: parsed.data,
+						scopedCss: Object.keys(components).map(name => components[name].css).join('\n').trim(),
 						React,
 						__html__: undefined
 					}
