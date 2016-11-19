@@ -1,0 +1,12 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Launch docs/",
+			"type": "chrome",
+			"request": "launch",
+			"file": "${workspaceRoot}/docs/index.html",
+			"userDataDir": "${workspaceRoot}/.vscode/chrome"
+		}
+	]
+}

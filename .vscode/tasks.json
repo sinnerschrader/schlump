@@ -8,12 +8,13 @@
   "suppressTaskName": true,
   "tasks": [
     {
-      "taskName": "site",
+      "taskName": "site:watch",
       "args": [
         "run",
-        "site"
+        "site:watch"
       ],
-      "isBuildCommand": true
+      "isBuildCommand": true,
+			"isWatching": true
     }
   ]
 }
