@@ -1,7 +1,14 @@
+.layout-html {
+  --main-red: rgb(238, 29, 35);
+  --main-yellow: rgb(255, 220, 1);
+}
+
 /* comment */
 
 .with-style-styled-container {
   border: 1px solid darkgreen;
+  color: var(--main-red);
+  background-color: var(--main-yellow);
 }
 
 

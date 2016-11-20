@@ -1,7 +1,13 @@
 ---
 name: Layout
 ---
-<html>
+<style scoped>
+.html {
+	--main-red: rgb(238, 29, 35);
+	--main-yellow: rgb(255, 220, 1);
+}
+</style>
+<html className={style.html}>
 <head>
 	<title>{props.title}</title>
 	<link href="./statics/site.css" rel="stylesheet"/>
