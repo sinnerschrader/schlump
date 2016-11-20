@@ -14,6 +14,7 @@
     "postrelease": "git push --follow-tags origin master && npm publish",
     "presite": "rimraf ./docs/* && lessc --clean-css ./node_modules/elemental/less/elemental.less docs/statics/elemental.styles.css",
     "site": "./cli.js --src ./site --dest ./docs --var.foo=bar --scoped-css=./docs/statics/scoped.css --template-import='elemental:UI'",
+    "postsite": "browserify site/statics/nav.js > docs/statics/nav.js",
     "site:watch": "chokidar '{index,cli}.js' 'src/**' 'site/**' --initial --command 'npm run site'"
   },
   "repository": {
@@ -63,6 +64,7 @@
     "upper-case-first": "^1.1.2"
   },
   "devDependencies": {
+    "browserify": "^13.1.1",
     "chokidar-cli": "^1.2.0",
     "conventional-changelog-lint": "^1.0.1",
     "cz-customizable": "^4.0.0",

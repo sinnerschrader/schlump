@@ -1,3 +1,7 @@
+window.React = require('react');
+window.ReactDOM = require('react-dom');
+window.UI = require('elemental');
+
 window.addEventListener('click', e => {
 	if (e.target.tagName === 'A') {
 		e.preventDefault();
@@ -15,6 +19,9 @@ function render() {
 	switch (window.location.pathname) {
 		case '/index2.html':
 			ReactDOM.render(SitePagesIndex2Html({foo: 'bar'}), document);
+			break;
+		case '/elemental.html':
+			ReactDOM.render(SitePagesElementalHtml({foo: 'bar'}), document);
 			break;
 		case '/index.html':
 		default:

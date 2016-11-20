@@ -98,12 +98,6 @@ window.Layout = (props, style = '[object Object]') => (React.createElement(
 			base: props.base
 		}),
 		React.createElement("script", {
-			src: "https://unpkg.com/react@15/dist/react.js"
-		}),
-		React.createElement("script", {
-			src: "https://unpkg.com/react-dom@15/dist/react-dom.js"
-		}),
-		React.createElement("script", {
 			src: "./statics/components.js"
 		}),
 		React.createElement("script", {
