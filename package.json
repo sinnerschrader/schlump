@@ -3,9 +3,9 @@
   "version": "0.13.2",
   "description": "A static site generator utilizing reactjs",
   "bin": {
-    "schlump": "./cli.js"
+    "schlump": "./src/cli.js"
   },
-  "main": "./index.js",
+  "main": "./src/index.js",
   "scripts": {
     "start": "npm run site",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,7 +13,7 @@
     "release": "standard-version --no-verify",
     "postrelease": "git push --follow-tags origin master && npm publish",
     "presite": "rimraf ./docs/* && lessc --clean-css ./node_modules/elemental/less/elemental.less docs/statics/elemental.styles.css",
-    "site": "./cli.js --src ./site --dest ./docs --var.foo=bar --scoped-css=./docs/statics/scoped.css --template-import='elemental:UI'",
+    "site": "./src/cli.js --src ./site --dest ./docs --var.foo=bar --scoped-css=./docs/statics/scoped.css --template-import='elemental:UI'",
     "site:watch": "chokidar '{index,cli}.js' 'src/**' 'site/**' --initial --command 'npm run site'"
   },
   "repository": {
