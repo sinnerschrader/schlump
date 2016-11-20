@@ -113,3 +113,17 @@ test('createScopedCss should return locally scoped css vars', t => {
 
 	t.deepEqual(actual, expected);
 });
+
+test('createScopedCss should handle comments gracefully', t => {
+	const inputHtml = `
+		<style scoped>
+			/* rule comment */
+			.selector {
+				/* declaration comment */
+				declaration: 'value';
+			}
+		</style>
+	`;
+
+	t.notThrows(() => createScopedCss(inputHtml, {ns: 'ns', vars: new Map()}, 'file'));
+});

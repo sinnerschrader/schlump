@@ -69,10 +69,15 @@ function getClassNames(ns, cssom) {
 		}, {});
 }
 
-function getVariables(cssom) {
+function getDeclarations(cssom) {
 	return cssom.stylesheet.rules
 		.filter(rule => rule.type === 'rule')
 		.reduce((declarations, rule) => [...declarations, ...rule.declarations], [])
+		.filter(declaration => declaration.type === 'declaration');
+}
+
+function getVariables(cssom) {
+	return getDeclarations(cssom)
 		.filter(declaration => declaration.property.startsWith('--'))
 		.reduce((vars, declaration) => {
 			vars.set(declaration.property, declaration.value);
@@ -81,9 +86,7 @@ function getVariables(cssom) {
 }
 
 function resolveScopeVariables(cssom, scope) {
-	cssom.stylesheet.rules
-		.filter(rule => rule.type === 'rule')
-		.reduce((declarations, rule) => [...declarations, ...rule.declarations], [])
+	getDeclarations(cssom)
 		.forEach(declaration => {
 			scope.forEach((value, variableName) => {
 				declaration.value = declaration.value.replace(`var(${variableName})`, value);
