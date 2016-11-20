@@ -4,9 +4,8 @@ const sander = require('sander');
 const chalk = require('chalk');
 
 const {renderPages} = require('./renderer');
-const {createReactComponents} = require('./components');
+const {createTemplates} = require('./templates');
 const {createRedirects} = require('./redirects');
-const {combineCss} = require('./css');
 const {mixinExternalTemplates} = require('./external-templates');
 
 module.exports = {
@@ -31,7 +30,7 @@ function build(opts) {
 	const promise =
 		sander.copydir(path.join(process.cwd(), srcStatics)).to(path.join(process.cwd(), destStatics))
 			.catch(() => {/* just ignore missing statics folder */})
-			.then(() => createReactComponents(srcTemplates, srcHelpers))
+			.then(() => createTemplates(srcTemplates, srcHelpers))
 			.then(components => mixinExternalTemplates(templateImport, components))
 			.then(components => globby([srcPages]).then(filepaths => [components, filepaths]))
 			.then(([components, filepaths]) => globby([path.join(destStatics, '**')])
@@ -47,7 +46,7 @@ function build(opts) {
 				renderPages(filepaths, dest, {components, vars, statics, disableValidation, scopedCss})
 					.then(pageStylesheets => {
 						if (scopedCss) {
-							return sander.writeFile(scopedCss, combineCss(components, pageStylesheets.map(css => css[1]).reduce((all, css) => [...all, ...css], [])));
+							return sander.writeFile(scopedCss, pageStylesheets.join('\n'));
 						}
 					})
 					.then(() => [components, statics]))

@@ -7,10 +7,11 @@ const matter = require('gray-matter');
 const chalk = require('chalk');
 const figures = require('figures');
 const {oneLine} = require('common-tags');
+const camelcase = require('camelcase');
+const uppercaseFirst = require('upper-case-first');
 
-const {transformJsx, evaluateHelpers} = require('./jsx');
 const {validatePages} = require('./validator');
-const {createScopedCss} = require('./css');
+const {createReactComponent} = require('./templates');
 
 module.exports = {
 	renderPages,
@@ -42,16 +43,16 @@ function renderPages(filepaths, dest, {components, vars, statics, disableValidat
 	return Promise.all(filepaths.map(filepath => {
 		return sander.readFile(filepath)
 			.then(content => renderPage(content, filepath, {components, vars, dest}))
-			.then(([html, destinationPath, scopedCss, cssParts]) => sander.writeFile(destinationPath, html)
-				.then(() => [destinationPath, scopedCss, cssParts]))
-			.then(([destinationPath, scopedCss, cssParts]) => {
+			.then(([html, destinationPath, cssParts]) => sander.writeFile(destinationPath, html)
+				.then(() => [destinationPath, cssParts]))
+			.then(([destinationPath, cssParts]) => {
 				console.log(`  ${chalk.bold.green(figures.tick)} ${filepath} -> ${destinationPath}`);
-				return [destinationPath, scopedCss, cssParts];
+				return [destinationPath, cssParts];
 			});
 	}))
 	.then(pageResults => disableValidation ||
 		validatePages(dest, pageResults.map(result => result[0]), statics)
-			.then(() => pageResults.map(result => [result[1], result[2]])));
+			.then(() => pageResults.map(result => result[1])));
 }
 
 function deprecatedGlobals(target, name, filepath) {
@@ -64,23 +65,24 @@ function renderPage(content, filepath, {components, vars, dest}) {
 	const parsed = matter(content.toString());
 	const destinationPath = getDestinationPath(parsed.data.route || filepath, dest);
 	const pageName = filepath.replace(/[./]/g, '-').replace(/^--/, '');
-	const [html, cssom, scopedCss] = createScopedCss(parsed.content, pageName, filepath);
-	const {helpers, statement} = transformJsx(html);
+	// TODO: Add helpers here
+	const pageComponentSandbox = {
+		global: new Proxy(Object.assign({}, vars), {
+			get: (target, name) => deprecatedGlobals(target, name, filepath)
+		}),
+		props: vars,
+		frontmatter: parsed.data
+	};
+	const pageComponent = createReactComponent(filepath, components, pageComponentSandbox,
+		{name: uppercaseFirst(camelcase(pageName)), code: parsed.content}).Component;
+
 	const sandbox = Object.assign(
 		{},
 		components,
-		evaluateHelpers(helpers),
 		{
-			global: new Proxy(Object.assign({}, vars), {
-				get: (target, name) => deprecatedGlobals(target, name, filepath)
-			}),
-			props: vars,
-			frontmatter: parsed.data,
-			style: cssom.classNames,
 			React,
 			__html__: undefined,
-			console,
-			filepath,
+			Page: pageComponent,
 			cssScope: new Map(),
 			cssParts: []
 		}
@@ -111,12 +113,12 @@ function renderPage(content, filepath, {components, vars, dest}) {
 				};
 			},
 			render() {
-				return ${statement};
+				return React.createElement(Page);
 			}
 		});
 		__html__ = React.createElement(DecoratedRootComponent);
 	`;
 
 	vm.runInNewContext(decoratedRootComponent, sandbox, opts);
-	return [`<!DOCTYPE html>${ReactDOM.renderToStaticMarkup(sandbox.__html__)}`, destinationPath, scopedCss, sandbox.cssParts];
+	return [`<!DOCTYPE html>${ReactDOM.renderToStaticMarkup(sandbox.__html__)}`, destinationPath, sandbox.cssParts.join('\n')];
 }

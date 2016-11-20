@@ -12,46 +12,74 @@ const {loadHelpers} = require('./helpers');
 const {transformJsx, evaluateHelpers} = require('./jsx');
 
 module.exports = {
-	createReactComponents
+	createTemplates,
+	createReactComponent
 };
 
-function createReactComponents(srcTemplates, srcHelpers) {
+function createTemplates(srcTemplates, srcHelpers) {
 	const helpers = loadHelpers(srcHelpers);
 	// Create component object here and add all components when created to have the reference already and
 	// resolve against it during runtime
-	const lazyComponentRegistry = {};
+	const componentRegistry = {};
 	return globby([srcTemplates])
 		.then(filepaths => {
 			return Promise.all(filepaths.map(filepath => {
 				return sander.readFile(filepath)
 					.then(content =>
-						createReactComponent(lazyComponentRegistry, helpers, filepath, content.toString()));
+						createTemplate(componentRegistry, helpers, filepath, content.toString()));
 			}))
 			.then(components => {
 				return components.reduce((all, comp) => {
 					all[comp.name] = comp.Component;
 					return all;
-				}, lazyComponentRegistry);
+				}, componentRegistry);
 			});
 		});
 }
 
-function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
+function createTemplate(components, helpers, filepath, code) {
 	const parsed = matter(code);
 	const name = parsed.data.name || uppercaseFirst(camelcase(path.basename(filepath, '.html')));
-	const [html,, scopedCss] = createScopedCss(parsed.content, name, filepath);
+	return createReactComponent(filepath, components, {helpers}, {name, code: parsed.content});
+}
+
+function createReactComponent(filepath, components, sandboxExtras, {name, code}) {
+	const [html] = createScopedCss(code, name, filepath);
 	const {helpers: jsxHelpers, statement} = transformJsx(html);
+	const sandbox = setupSandbox(components, sandboxExtras, jsxHelpers, createLocalStyleFactory(code, name, filepath));
+	const opts = {
+		filename: filepath,
+		displayErrors: true
+	};
+	const componentCode = `
+		const SFC = (reactProps, context) => {
+			const props = Object.assign({}, sandboxProps, reactProps);
+			const style = getLocalStyle(context);
+			return (${statement});
+		};
+		SFC.contextTypes = {scope: React.PropTypes.any};
+		${name} = contextStackFactory(SFC);
+	`;
+	vm.runInNewContext(componentCode, sandbox, opts);
+
+	return {
+		name,
+		Component: sandbox[name]
+	};
+}
+
+function setupSandbox(components, sandboxExtras, jsxHelpers, getLocalStyle) {
+	if (sandboxExtras.props) {
+		sandboxExtras.sandboxProps = sandboxExtras.props;
+	}
 	const proxyHandler = {
 		/*
 		 * Trap property resolution
 		 */
 		get: function (target, name) {
 			// Check if we have a component with this name
-			if (lazyComponentRegistry[name]) {
-				return lazyComponentRegistry[name];
-			}
-			if (name === 'helpers') {
-				return helpers;
+			if (components[name]) {
+				return components[name];
 			}
 			return target[name];
 		}
@@ -61,31 +89,14 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 			React,
 			name: undefined,
 			contextStackFactory,
-			getLocalStyle: createLocalStyleFactory(parsed.content, name, filepath)
+			getLocalStyle,
+			Object
 		},
+		sandboxExtras,
 		evaluateHelpers(jsxHelpers)
 	);
 
-	const sandbox = new Proxy(proxyTarget, proxyHandler);
-	const opts = {
-		filename: filepath,
-		displayErrors: true
-	};
-	const statelessFunctionComponentCode = `
-		const SFC = (props, context) => {
-			const style = getLocalStyle(context);
-			return (${statement});
-		};
-		SFC.contextTypes = {scope: React.PropTypes.any};
-		${name} = contextStackFactory(SFC);
-	`;
-	vm.runInNewContext(statelessFunctionComponentCode, sandbox, opts);
-	sandbox[name].css = scopedCss;
-
-	return {
-		name,
-		Component: sandbox[name]
-	};
+	return new Proxy(proxyTarget, proxyHandler);
 }
 
 function createLocalStyleFactory(htmlSource, ns, filepath) {
