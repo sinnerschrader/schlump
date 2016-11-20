@@ -27,11 +27,10 @@ function createScopedCss(html, scope, filepath) {
 	}
 	const cssom = css.parse(style[1], {source: filepath});
 	cssom.classNames = getClassNames(scope.ns, cssom);
-	cssom.vars = getVariables(cssom);
-	const localScope = new Map(scope.vars.entries());
-	cssom.vars.forEach((value, key) => localScope.set(key, value));
+	cssom.vars = new Map(scope.vars.entries());
+	getVariables(cssom).forEach((value, key) => cssom.vars.set(key, value));
 
-	resolveScopeVariables(cssom, localScope);
+	resolveScopeVariables(cssom, cssom.vars);
 
 	return [html.trim(), cssom, css.stringify(cssom)];
 }

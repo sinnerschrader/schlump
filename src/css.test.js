@@ -86,3 +86,30 @@ test('createScopedCss should replace CSS vars with values from given scope', t =
 
 	t.deepEqual(actual, expected);
 });
+
+test('createScopedCss should return locally scoped css vars', t => {
+	const inputHtml = `
+		<style scoped>
+			.selector {
+				--first-variable: red;
+				--second-variable: blue;
+			}
+		</style>
+	`;
+	const inputScope = {
+		ns: 'ns',
+		vars: new Map([
+			['--second-variable', 'green'],
+			['--third-variable', 'yellow']
+		])
+	};
+	const expected = new Map([
+		['--first-variable', 'red'],
+		['--second-variable', 'blue'],
+		['--third-variable', 'yellow']
+	]);
+
+	const [, {vars: actual}] = createScopedCss(inputHtml, inputScope, 'file');
+
+	t.deepEqual(actual, expected);
+});
