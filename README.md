@@ -162,6 +162,34 @@ Given schlump is started with the parameter `--redirect-map map.json` and map.js
 then schlump generates a page at `<dest>/old/page/url/index.html` which contains a meta refresh
 to `https://github.com/sinnerschrader/schlump`.
 
+## Scoped CSS
+
+Pages and Templates could have a scoped css tag which contains the styles of that component.
+Only simple selectors are possible which implicitly means that the style rules are scoped to that component.
+
+```html
+---
+name: Element
+---
+<style scoped>
+.element {
+    color: blue;
+}
+.headline {
+    color: green;
+}
+.copy {
+    color: red;
+}
+</style>
+<div className={style.element}>
+    <h1 className={style.headline}>headline<h1>
+    <p className={style.copy}>
+        copytext
+    </p>
+</div>
+```
+
 ## Template Imports
 
 With the option `--template-import` it is possible to integrate external [React](https://reactjs.com) component
