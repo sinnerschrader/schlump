@@ -25,6 +25,7 @@ const cli = meow(`
 		--var.<name>=<value>   Define global properties which are usable during build pages
 		--disable-validation   Disable html validation (no link and resource checking)
 		--redirect-map         A json file with key value pairs of url-path (source) and full qualifed urls (target)
+		--scoped-css           Path of the file to write all scoped css to
 		--template-import='<file-or-node-module-path>[:<namespace>]'
 		                       Imports the react-components from the given path at the given namespace
 `, {
@@ -46,6 +47,7 @@ function main(flags) {
 		vars: flags.var,
 		disableValidation: flags.disableValidation,
 		redirectMap: flags.redirectMap,
+		scopedCss: flags.scopedCss,
 		templateImport: flags.templateImport
 	};
 

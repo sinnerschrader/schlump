@@ -13,7 +13,7 @@
     "release": "standard-version --no-verify",
     "postrelease": "git push --follow-tags origin master && npm publish",
     "presite": "rimraf ./docs/* && lessc --clean-css ./node_modules/elemental/less/elemental.less docs/statics/elemental.styles.css",
-    "site": "./cli.js --src ./site --dest ./docs --var.foo=bar --template-import='elemental:UI'",
+    "site": "./cli.js --src ./site --dest ./docs --var.foo=bar --scoped-css=./docs/statics/scoped.css --template-import='elemental:UI'",
     "site:watch": "chokidar '{index,cli}.js' 'src/**' 'site/**' --initial --command 'npm run site'"
   },
   "repository": {
@@ -43,10 +43,11 @@
     "babel-core": "^6.14.0",
     "babel-generator": "^6.17.0",
     "babel-plugin-transform-react-jsx": "^6.8.0",
-    "camelcase": "^3.0.0",
+    "camelcase": "^4.0.0",
     "chalk": "^1.1.3",
     "common-tags": "^1.3.1",
     "css": "^2.2.1",
+    "decamelize": "^1.2.0",
     "figures": "^2.0.0",
     "globby": "^6.0.0",
     "gray-matter": "^2.0.2",
