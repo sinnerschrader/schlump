@@ -64,6 +64,27 @@ function deprecatedGlobals(target, name, filepath) {
 function renderPage(content, filepath, {components, vars, dest}) {
 	const parsed = matter(content.toString());
 	const destinationPath = getDestinationPath(parsed.data.route || filepath, dest);
+	const pageComponent = createPageComponent(vars, filepath, parsed, components);
+	const cssParts = [];
+	const sandbox = Object.assign(
+		{},
+		components,
+		{
+			React,
+			__html__: undefined,
+			DecoratedRootComponent: createDecoratedRootComponent(pageComponent, new Map(), cssParts)
+		}
+	);
+	const opts = {
+		filename: filepath,
+		displayErrors: true
+	};
+
+	vm.runInNewContext('__html__ = React.createElement(DecoratedRootComponent);', sandbox, opts);
+	return [`<!DOCTYPE html>${ReactDOM.renderToStaticMarkup(sandbox.__html__)}`, destinationPath, cssParts.join('\n')];
+}
+
+function createPageComponent(vars, filepath, parsed, components) {
 	const pageName = filepath.replace(/[./]/g, '-').replace(/^--/, '');
 	// TODO: Add helpers here
 	const pageComponentSandbox = {
@@ -73,52 +94,34 @@ function renderPage(content, filepath, {components, vars, dest}) {
 		props: vars,
 		frontmatter: parsed.data
 	};
-	const pageComponent = createReactComponent(filepath, components, pageComponentSandbox,
+	return createReactComponent(filepath, components, pageComponentSandbox,
 		{name: uppercaseFirst(camelcase(pageName)), code: parsed.content}).Component;
+}
 
-	const sandbox = Object.assign(
-		{},
-		components,
-		{
-			React,
-			__html__: undefined,
-			Page: pageComponent,
-			cssScope: new Map(),
-			cssParts: []
-		}
-	);
-	const opts = {
-		filename: filepath,
-		displayErrors: true
-	};
-
-	const decoratedRootComponent = `
-		var DecoratedRootComponent = React.createClass({
-			childContextTypes: {
-				scope: React.PropTypes.any
-			},
-			getChildContext: function() {
-				return {
-					scope: {
-						get: function() {
-							return cssScope;
-						},
-						set: function(newScope) {
-							cssScope = newScope;
-						},
-						css: css => {
-							cssParts.push(css);
-						}
+function createDecoratedRootComponent(Page, cssScope, cssParts) {
+	class DecoratedRootComponent extends React.Component {
+		getChildContext() {
+			return {
+				scope: {
+					get: function () {
+						return cssScope;
+					},
+					set: function (newScope) {
+						cssScope = newScope;
+					},
+					css: css => {
+						cssParts.push(css);
 					}
-				};
-			},
-			render() {
-				return React.createElement(Page);
-			}
-		});
-		__html__ = React.createElement(DecoratedRootComponent);
-	`;
+				}
+			};
+		}
 
-	vm.runInNewContext(decoratedRootComponent, sandbox, opts);
-	return [`<!DOCTYPE html>${ReactDOM.renderToStaticMarkup(sandbox.__html__)}`, destinationPath, sandbox.cssParts.join('\n')];
+		render() {
+			return React.createElement(Page);
+		}
+	}
+	DecoratedRootComponent.childContextTypes = {
+		scope: React.PropTypes.any
+	};
+	return DecoratedRootComponent;
 }
