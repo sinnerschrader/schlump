@@ -7,6 +7,7 @@ const {renderPages} = require('./src/renderer');
 const {createReactComponents} = require('./src/components');
 const {createRedirects} = require('./src/redirects');
 const {combineCss} = require('./src/css');
+const {mixinExternalTemplates} = require('./src/external-templates');
 
 module.exports = {
 	build
@@ -26,11 +27,12 @@ function logResult(promise) {
 
 function build(opts) {
 	const {srcPages, srcTemplates, srcStatics, srcHelpers, dest, destStatics, vars, disableValidation,
-		redirectMap, scopedCss} = opts;
+		redirectMap, scopedCss, templateImport} = opts;
 	const promise =
 		sander.copydir(path.join(process.cwd(), srcStatics)).to(path.join(process.cwd(), destStatics))
 			.catch(() => {/* just ignore missing statics folder */})
 			.then(() => createReactComponents(srcTemplates, srcHelpers))
+			.then(components => mixinExternalTemplates(templateImport, components))
 			.then(components => globby([srcPages]).then(filepaths => [components, filepaths]))
 			.then(([components, filepaths]) => globby([path.join(destStatics, '**')])
 				.then(statics => {
