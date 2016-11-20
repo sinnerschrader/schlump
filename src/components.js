@@ -39,7 +39,7 @@ function createReactComponents(srcTemplates, srcHelpers) {
 function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 	const parsed = matter(code);
 	const name = parsed.data.name || uppercaseFirst(camelcase(path.basename(filepath, '.html')));
-	const [html, cssom, scopedCss] = createScopedCss(parsed.content, name, filepath);
+	const [html,, scopedCss] = createScopedCss(parsed.content, name, filepath);
 	const {helpers: jsxHelpers, statement} = transformJsx(html);
 	const proxyHandler = {
 		/*
@@ -60,11 +60,8 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 		{
 			React,
 			name: undefined,
-			style: cssom.classNames,
-			cssScope: cssom.vars,
-			console,
-			createScopedCss, htmlSource: parsed.content, componentName: name, filepath,
-			Map, Object
+			contextStackFactory,
+			getLocalStyle: createLocalStyleFactory(parsed.content, name, filepath)
 		},
 		evaluateHelpers(jsxHelpers)
 	);
@@ -76,40 +73,11 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 	};
 	const statelessFunctionComponentCode = `
 		const SFC = (props, context) => {
-			const myscope = context.scope.get();
-			const [, {vars}] = createScopedCss(htmlSource, {ns: componentName, vars: myscope}, filepath);
-			context.scope.set(vars);
+			const style = getLocalStyle(context);
 			return (${statement});
 		};
 		SFC.contextTypes = {scope: React.PropTypes.any};
-
-		var DecoratedComponent = React.createClass({
-			contextTypes: {
-				scope: React.PropTypes.any
-			},
-			childContextTypes: {
-				scope: React.PropTypes.any
-			},
-			getChildContext: function() {
-				return {
-					scope: {
-						get: () => {
-							if (this.localScope) {
-								return this.localScope;
-							}
-							return this.context.scope.get();
-						},
-						set: (newScope) => {
-							this.localScope = newScope;
-						}
-					}
-				};
-			},
-			render() {
-				return React.createElement(SFC, this.props, this.props.children);
-			}
-		});
-		${name} = DecoratedComponent;
+		${name} = contextStackFactory(SFC);
 	`;
 	vm.runInNewContext(statelessFunctionComponentCode, sandbox, opts);
 	sandbox[name].css = scopedCss;
@@ -118,4 +86,47 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 		name,
 		Component: sandbox[name]
 	};
+}
+
+function createLocalStyleFactory(htmlSource, ns, filepath) {
+	return context => {
+		const [, {classNames, vars}, css] = createScopedCss(htmlSource, {ns: `${ns}-${String(Math.random()).replace('.', '')}`, vars: context.scope.get()}, filepath);
+		context.scope.set(vars);
+		context.scope.css(css);
+		return classNames;
+	};
+}
+
+function contextStackFactory(SFC) {
+	class ContextStack extends React.Component {
+		getChildContext() {
+			return {
+				scope: {
+					get: () => {
+						if (this.localScope) {
+							return this.localScope;
+						}
+						return this.context.scope.get();
+					},
+					set: newScope => {
+						this.localScope = newScope;
+					},
+					css: css => {
+						this.context.scope.css(css);
+					}
+				}
+			};
+		}
+
+		render() {
+			return React.createElement(SFC, this.props, this.props.children);
+		}
+	}
+	ContextStack.contextTypes = {
+		scope: React.PropTypes.any
+	};
+	ContextStack.childContextTypes = {
+		scope: React.PropTypes.any
+	};
+	return ContextStack;
 }

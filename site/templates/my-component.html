@@ -2,8 +2,8 @@
 name: MyComponent
 ---
 <style scoped>
-.abc {
-	--main-red: blue;
+.colored {
+	color: var(--main-red);
 }
 </style>
-<div>{helpers.loremIpsum(props.message)}</div>
+<div className={style.colored}>{helpers.loremIpsum(props.message)}</div>

@@ -47,7 +47,7 @@ function build(opts) {
 				renderPages(filepaths, dest, {components, vars, statics, disableValidation, scopedCss})
 					.then(pageStylesheets => {
 						if (scopedCss) {
-							return sander.writeFile(scopedCss, combineCss(components, pageStylesheets));
+							return sander.writeFile(scopedCss, combineCss(components, pageStylesheets.map(css => css[1]).reduce((all, css) => [...all, ...css], [])));
 						}
 					})
 					.then(() => [components, statics]))

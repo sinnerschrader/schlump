@@ -10,7 +10,7 @@ const {oneLine} = require('common-tags');
 
 const {transformJsx, evaluateHelpers} = require('./jsx');
 const {validatePages} = require('./validator');
-const {createScopedCss, combineCss} = require('./css');
+const {createScopedCss} = require('./css');
 
 module.exports = {
 	renderPages,
@@ -42,16 +42,16 @@ function renderPages(filepaths, dest, {components, vars, statics, disableValidat
 	return Promise.all(filepaths.map(filepath => {
 		return sander.readFile(filepath)
 			.then(content => renderPage(content, filepath, {components, vars, dest}))
-			.then(([html, destinationPath, scopedCss]) => sander.writeFile(destinationPath, html)
-				.then(() => [destinationPath, scopedCss]))
-			.then(([destinationPath, scopedCss]) => {
+			.then(([html, destinationPath, scopedCss, cssParts]) => sander.writeFile(destinationPath, html)
+				.then(() => [destinationPath, scopedCss, cssParts]))
+			.then(([destinationPath, scopedCss, cssParts]) => {
 				console.log(`  ${chalk.bold.green(figures.tick)} ${filepath} -> ${destinationPath}`);
-				return [destinationPath, scopedCss];
+				return [destinationPath, scopedCss, cssParts];
 			});
 	}))
 	.then(pageResults => disableValidation ||
 		validatePages(dest, pageResults.map(result => result[0]), statics)
-			.then(() => pageResults.map(result => result[1])));
+			.then(() => pageResults.map(result => [result[1], result[2]])));
 }
 
 function deprecatedGlobals(target, name, filepath) {
@@ -77,12 +77,12 @@ function renderPage(content, filepath, {components, vars, dest}) {
 			props: vars,
 			frontmatter: parsed.data,
 			style: cssom.classNames,
-			scopedCss: combineCss(components, scopedCss),
 			React,
 			__html__: undefined,
 			console,
 			filepath,
-			cssScopeStack: [new Map()]
+			cssScope: new Map(),
+			cssParts: []
 		}
 	);
 	const opts = {
@@ -99,16 +99,18 @@ function renderPage(content, filepath, {components, vars, dest}) {
 				return {
 					scope: {
 						get: function() {
-							return cssScopeStack[0];
+							return cssScope;
 						},
 						set: function(newScope) {
-							cssScopeStack.unshift(newScope);
+							cssScope = newScope;
+						},
+						css: css => {
+							cssParts.push(css);
 						}
 					}
 				};
 			},
 			render() {
-				console.log('render', filepath);
 				return ${statement};
 			}
 		});
@@ -116,5 +118,5 @@ function renderPage(content, filepath, {components, vars, dest}) {
 	`;
 
 	vm.runInNewContext(decoratedRootComponent, sandbox, opts);
-	return ['<!DOCTYPE html>' + ReactDOM.renderToStaticMarkup(sandbox.__html__), destinationPath, scopedCss];
+	return [`<!DOCTYPE html>${ReactDOM.renderToStaticMarkup(sandbox.__html__)}`, destinationPath, scopedCss, sandbox.cssParts];
 }
