@@ -60,7 +60,11 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 		{
 			React,
 			name: undefined,
-			style: cssom.classNames
+			style: cssom.classNames,
+			cssScope: cssom.vars,
+			console,
+			createScopedCss, htmlSource: parsed.content, componentName: name, filepath,
+			Map, Object
 		},
 		evaluateHelpers(jsxHelpers)
 	);
@@ -70,7 +74,44 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 		filename: filepath,
 		displayErrors: true
 	};
-	vm.runInNewContext(`${name} = (props) => (${statement})`, sandbox, opts);
+	const statelessFunctionComponentCode = `
+		const SFC = (props, context) => {
+			const myscope = context.scope.get();
+			const [, {vars}] = createScopedCss(htmlSource, {ns: componentName, vars: myscope}, filepath);
+			context.scope.set(vars);
+			return (${statement});
+		};
+		SFC.contextTypes = {scope: React.PropTypes.any};
+
+		var DecoratedComponent = React.createClass({
+			contextTypes: {
+				scope: React.PropTypes.any
+			},
+			childContextTypes: {
+				scope: React.PropTypes.any
+			},
+			getChildContext: function() {
+				return {
+					scope: {
+						get: () => {
+							if (this.localScope) {
+								return this.localScope;
+							}
+							return this.context.scope.get();
+						},
+						set: (newScope) => {
+							this.localScope = newScope;
+						}
+					}
+				};
+			},
+			render() {
+				return React.createElement(SFC, this.props, this.props.children);
+			}
+		});
+		${name} = DecoratedComponent;
+	`;
+	vm.runInNewContext(statelessFunctionComponentCode, sandbox, opts);
 	sandbox[name].css = scopedCss;
 
 	return {

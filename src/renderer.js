@@ -79,13 +79,42 @@ function renderPage(content, filepath, {components, vars, dest}) {
 			style: cssom.classNames,
 			scopedCss: combineCss(components, scopedCss),
 			React,
-			__html__: undefined
+			__html__: undefined,
+			console,
+			filepath,
+			cssScopeStack: [new Map()]
 		}
 	);
 	const opts = {
 		filename: filepath,
 		displayErrors: true
 	};
-	vm.runInNewContext('__html__ = ' + statement, sandbox, opts);
+
+	const decoratedRootComponent = `
+		var DecoratedRootComponent = React.createClass({
+			childContextTypes: {
+				scope: React.PropTypes.any
+			},
+			getChildContext: function() {
+				return {
+					scope: {
+						get: function() {
+							return cssScopeStack[0];
+						},
+						set: function(newScope) {
+							cssScopeStack.unshift(newScope);
+						}
+					}
+				};
+			},
+			render() {
+				console.log('render', filepath);
+				return ${statement};
+			}
+		});
+		__html__ = React.createElement(DecoratedRootComponent);
+	`;
+
+	vm.runInNewContext(decoratedRootComponent, sandbox, opts);
 	return ['<!DOCTYPE html>' + ReactDOM.renderToStaticMarkup(sandbox.__html__), destinationPath, scopedCss];
 }

@@ -23,7 +23,7 @@ function createScopedCss(html, scope, filepath) {
 	const style = html.match(styleMatcher);
 	html = html.replace(styleMatcher, '');
 	if (!style) {
-		return [html, {classNames: {}}, ''];
+		return [html, {classNames: {}, vars: scope.vars}, ''];
 	}
 	const cssom = css.parse(style[1], {source: filepath});
 	cssom.classNames = getClassNames(scope.ns, cssom);
