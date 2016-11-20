@@ -7,6 +7,7 @@ const uppercaseFirst = require('upper-case-first');
 const React = require('react');
 const matter = require('gray-matter');
 
+const {createScopedCss} = require('./css');
 const {loadHelpers} = require('./helpers');
 const {transformJsx, evaluateHelpers} = require('./jsx');
 
@@ -38,8 +39,8 @@ function createReactComponents(srcTemplates, srcHelpers) {
 function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 	const parsed = matter(code);
 	const name = parsed.data.name || uppercaseFirst(camelcase(path.basename(filepath, '.html')));
-	const {helpers: jsxHelpers, statement} = transformJsx(parsed.content);
-
+	const [html, cssom, scopedCss] = createScopedCss(parsed.content, name, filepath);
+	const {helpers: jsxHelpers, statement} = transformJsx(html);
 	const proxyHandler = {
 		/*
 		 * Trap property resolution
@@ -58,7 +59,8 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 	const proxyTarget = Object.assign(
 		{
 			React,
-			name: undefined
+			name: undefined,
+			style: cssom.classNames
 		},
 		evaluateHelpers(jsxHelpers)
 	);
@@ -69,6 +71,7 @@ function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 		displayErrors: true
 	};
 	vm.runInNewContext(`${name} = (props) => (${statement})`, sandbox, opts);
+	sandbox[name].css = scopedCss;
 
 	return {
 		name,

@@ -5,6 +5,14 @@ name: Layout
 <head>
 	<title>{props.title}</title>
 	<link href="./statics/site.css" rel="stylesheet"/>
+	{props.scopedCss ? (
+		<style type="text/css">
+			{props.scopedCss}
+		</style>
+	) : null}
+	{!props.scopedCss ? (
+		<link href="./statics/scoped.css" rel="stylesheet"/>
+	) : null}
 </head>
 <body>
 	<div className="content">
