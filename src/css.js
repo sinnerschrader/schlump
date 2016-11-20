@@ -11,11 +11,13 @@ module.exports = {
  * Strips scoped style from html and return html and metadata.
  *
  * @param {string} html HTML input source
- * @param {string} ns Namespace for generated classNames
+ * @param {Object|string} scope Namespace for generated classNames
  * @param {string?} filepath Input file path (mainly for debugging)
  * @returns [html: string, CSSOM: {classNames: any, vars: any}, css: string]
  */
-function createScopedCss(html, ns, filepath) {
+function createScopedCss(html, scope, filepath) {
+	scope = typeof scope === 'string' ? {ns: scope, vars: new Map()} : scope;
+
 	// https://regex101.com/r/EFULGo/2
 	const styleMatcher = /<style(?:.+)scoped(?:.*)>((?:.|[\r\n])*?)<\/style>/i;
 	const style = html.match(styleMatcher);
@@ -24,8 +26,13 @@ function createScopedCss(html, ns, filepath) {
 		return [html, {classNames: {}}, ''];
 	}
 	const cssom = css.parse(style[1], {source: filepath});
-	cssom.classNames = getClassNames(ns, cssom);
+	cssom.classNames = getClassNames(scope.ns, cssom);
 	cssom.vars = getVariables(cssom);
+	const localScope = new Map(scope.vars.entries());
+	cssom.vars.forEach((value, key) => localScope.set(key, value));
+
+	resolveScopeVariables(cssom, localScope);
+
 	return [html.trim(), cssom, css.stringify(cssom)];
 }
 
@@ -72,4 +79,15 @@ function getVariables(cssom) {
 			vars.set(declaration.property, declaration.value);
 			return vars;
 		}, new Map());
+}
+
+function resolveScopeVariables(cssom, scope) {
+	cssom.stylesheet.rules
+		.filter(rule => rule.type === 'rule')
+		.reduce((declarations, rule) => [...declarations, ...rule.declarations], [])
+		.forEach(declaration => {
+			scope.forEach((value, variableName) => {
+				declaration.value = declaration.value.replace(`var(${variableName})`, value);
+			});
+		});
 }

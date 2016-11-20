@@ -62,3 +62,27 @@ test('createScopedCss should add scoped variables to the CSSOM', t => {
 
 	t.deepEqual(actual, expected);
 });
+
+test('createScopedCss should replace CSS vars with values from given scope', t => {
+	const input = stripIndent`
+		<style scoped>
+			.selector {
+				--first-variable: red;
+				color: var(--first-variable);
+				background-color: var(--second-variable);
+			}
+		</style>
+	`;
+	const expected = stripIndent`
+		.name-selector {
+		  --first-variable: red;
+		  color: red;
+		  background-color: blue;
+		}
+	`;
+
+	const vars = new Map([['--second-variable', 'blue']]);
+	const [, , actual] = createScopedCss(input, {ns: 'name', vars}, 'file');
+
+	t.deepEqual(actual, expected);
+});
