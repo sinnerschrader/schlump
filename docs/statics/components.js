@@ -2,6 +2,19 @@ helpers = {};
 helpers.loremIpsum = function (text) {
 	return text || 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
 };
+window.EmailField = (props, style = '[object Object]') => (React.createElement(
+	UI.FormField,
+	{
+		label: "Email address",
+		htmlFor: "basic-form-input-email"
+	},
+	React.createElement(UI.FormInput, {
+		autoFocus: true,
+		type: "email",
+		placeholder: "Enter email",
+		name: "basic-form-input-email"
+	})
+));
 window.JsLogo = (props, style = '[object Object]') => (React.createElement("img", {
   src: props.base + '/statics/js.png',
   width: "50"
@@ -52,7 +65,11 @@ window.Layout = (props, style = '[object Object]') => (React.createElement(
 		!props.scopedCss ? React.createElement("link", {
 			href: "./statics/scoped.css",
 			rel: "stylesheet"
-		}) : null
+		}) : null,
+		React.createElement("link", {
+			href: "./statics/elemental.styles.css",
+			rel: "stylesheet"
+		})
 	),
 	React.createElement(
 		"body",
@@ -111,6 +128,39 @@ window.WithStyle = (props, style = '[object Object]') => (React.createElement(
 	),
 	React.createElement(MyComponent, null)
 ));
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+		window.SitePagesElementalHtml =
+			(props, frontmatter = {"title":"Schlump!","route":"/elemental.html"}, scopedCss = '', style = '{}') =>
+			(React.createElement(
+	Layout,
+	_extends({}, frontmatter, {
+		base: "."
+	}),
+	React.createElement(
+		UI.Form,
+		null,
+		React.createElement(EmailField, null)
+	),
+	React.createElement(
+		UI.Button,
+		{
+			type: "primary"
+		},
+		"Primary"
+	),
+	React.createElement(
+		"div",
+		null,
+		React.createElement(
+			"a",
+			{
+				href: "./index.html"
+			},
+			"Link to page 1"
+		)
+	)
+));
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 		window.SitePagesIndexHtml =
 			(props, frontmatter = {"title":"Schlump!","route":"/index.html"}, scopedCss = '', style = '{}') =>
@@ -130,11 +180,26 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 		React.createElement(MyComponent, null)
 	),
 	React.createElement(
-		"a",
-		{
-			href: "./index2.html"
-		},
-		"Link to page 2"
+		"div",
+		null,
+		React.createElement(
+			"a",
+			{
+				href: "./index2.html"
+			},
+			"Link to page 2"
+		)
+	),
+	React.createElement(
+		"div",
+		null,
+		React.createElement(
+			"a",
+			{
+				href: "./elemental.html"
+			},
+			"Link to External elemental components"
+		)
 	)
 ));
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
