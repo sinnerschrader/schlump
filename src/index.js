@@ -46,7 +46,8 @@ function build(opts) {
 				renderPages(filepaths, dest, {components, vars, statics, disableValidation, scopedCss})
 					.then(pageStylesheets => {
 						if (scopedCss) {
-							return sander.writeFile(scopedCss, pageStylesheets.join('\n'));
+							return sander.writeFile(scopedCss,
+								Array.from(new Set(pageStylesheets.join('\n').split('}').map(rule => rule.trim() + '}'))).join('\n'));
 						}
 					})
 					.then(() => [components, statics]))

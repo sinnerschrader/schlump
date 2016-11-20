@@ -101,7 +101,7 @@ function setupSandbox(components, sandboxExtras, jsxHelpers, getLocalStyle) {
 
 function createLocalStyleFactory(htmlSource, ns, filepath) {
 	return context => {
-		const [, {classNames, vars}, css] = createScopedCss(htmlSource, {ns: `${ns}-${String(Math.random()).replace('.', '')}`, vars: context.scope.get()}, filepath);
+		const [, {classNames, vars}, css] = createScopedCss(htmlSource, {ns, vars: context.scope.get()}, filepath);
 		context.scope.set(vars);
 		context.scope.css(css);
 		return classNames;

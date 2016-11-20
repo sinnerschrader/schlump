@@ -26,13 +26,28 @@ function createScopedCss(html, scope, filepath) {
 		return [html, {classNames: {}, vars: scope.vars}, ''];
 	}
 	const cssom = css.parse(style[1], {source: filepath});
-	cssom.classNames = getClassNames(scope.ns, cssom);
 	cssom.vars = new Map(scope.vars.entries());
 	getVariables(cssom).forEach((value, key) => cssom.vars.set(key, value));
 
 	resolveScopeVariables(cssom, cssom.vars);
+	const hash = createHash(css.stringify(cssom));
+	cssom.classNames = getClassNames(`${scope.ns}-${hash}`, cssom);
 
 	return [html.trim(), cssom, css.stringify(cssom)];
+}
+
+function createHash(input) {
+	let hash = 0;
+	if (input.length === 0) {
+		return hash;
+	}
+	for (let i = 0; i < input.length; i++) {
+		const char = input.charCodeAt(i);
+		hash = ((hash << 5) - hash) + char;
+		// Convert to 32bit integer
+		hash &= hash;
+	}
+	return hash;
 }
 
 /**
@@ -59,9 +74,9 @@ function getClassNames(ns, cssom) {
 	return cssom.stylesheet.rules
 		.filter(rule => rule.type === 'rule')
 		.reduce((rules, rule) => {
-			const result = [...rules, ...rule.selectors];
+			rules = [...rules, ...rule.selectors];
 			rule.selectors = rule.selectors.map(selector => `.${toScopedClassName(ns, selector)}`);
-			return result;
+			return rules;
 		}, [])
 		.reduce((classNames, selector) => {
 			classNames[camelcase(selector)] = toScopedClassName(ns, selector);

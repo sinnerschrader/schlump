@@ -1,25 +1,9 @@
-
-.layout-06754485052430774-html {
+.layout-771144403-html {
   --main-red: rgb(238, 29, 35);
-  --main-yellow: rgb(255, 220, 1);
-}
-
-
-
-
-.layout-03597826524813348-html {
-  --main-red: rgb(238, 29, 35);
-  --main-yellow: rgb(255, 220, 1);
-}
-.my-component-011094687706407536-colored {
-  color: rgb(238, 29, 35);
-}
-.my-component-021595830118635617-colored {
-  color: rgb(238, 29, 35);
-}
-
-
-.site-pages-index2-html-01654529645184124-second-page {
+  --main-yellow: rgb(255, 220, 1);}
+.my-component-100140932-colored {
+  color: rgb(238, 29, 35);}
+.site-pages-index2-html--469062578-second-page {
   /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fcecfc+0,fba6e1+50,fd89d7+51,ff7cd8+100;Pink+Gloss+%232 */
   background: rgb(252,236,252);
   /* Old browsers */
@@ -30,26 +14,13 @@
   background: linear-gradient(to bottom,  rgba(252,236,252,1) 0%,rgba(251,166,225,1) 50%,rgba(253,137,215,1) 51%,rgba(255,124,216,1) 100%);
   /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcecfc', endColorstr='#ff7cd8',GradientType=0 );
-  /* IE6-9 */
-}
-.layout-08759912274468931-html {
-  --main-red: rgb(238, 29, 35);
-  --main-yellow: rgb(255, 220, 1);
-}
-.my-component-08611474440584652-colored {
-  color: rgb(238, 29, 35);
-}
+  /* IE6-9 */}
 /* comment */
 
-.with-style-0025265836553083565-styled-container {
+.with-style-806350838-styled-container {
   --main-red: blue;
   border: 1px solid darkgreen;
-  background-color: rgb(255, 220, 1);
+  background-color: rgb(255, 220, 1);}
+.my-component--727887898-colored {
+  color: blue;}
 }
-.my-component-06889662160538015-colored {
-  color: blue;
-}
-.my-component-03507222736851445-colored {
-  color: rgb(238, 29, 35);
-}
-
