@@ -88,6 +88,9 @@ window.Layout = (props, style = '[object Object]') => (React.createElement(
 		}),
 		React.createElement("script", {
 			src: "./statics/components.js"
+		}),
+		React.createElement("script", {
+			src: "./statics/nav.js"
 		})
 	)
 ));
