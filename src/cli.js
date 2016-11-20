@@ -1,11 +1,12 @@
 #!/usr/bin/env node
+
 const semver = require('semver');
 const meow = require('meow');
 const build = require('./index').build;
 
 if (!semver.satisfies(process.version, '>=6')) {
 	console.error('At least node 6 is required');
-	process.exit(1); // eslint-disable-line xo/no-process-exit
+	process.exit(1); // eslint-disable-line unicorn/no-process-exit
 }
 
 const cli = meow(`
