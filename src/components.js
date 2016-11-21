@@ -10,6 +10,7 @@ const matter = require('gray-matter');
 const {createScopedCss} = require('./css');
 const {loadHelpers} = require('./helpers');
 const {transformJsx, evaluateHelpers} = require('./jsx');
+const {Markdown} = require('./markdown');
 
 module.exports = {
 	createReactComponents
@@ -19,7 +20,9 @@ function createReactComponents(srcTemplates, srcHelpers) {
 	const helpers = loadHelpers(srcHelpers);
 	// Create component object here and add all components when created to have the reference already and
 	// resolve against it during runtime
-	const lazyComponentRegistry = {};
+	const lazyComponentRegistry = {
+		Markdown
+	};
 	return globby([srcTemplates])
 		.then(filepaths => {
 			return Promise.all(filepaths.map(filepath => {

@@ -4,12 +4,15 @@ const requireAll = require('require-all');
 const chalk = require('chalk');
 const figures = require('figures');
 
+const {renderMarkdown} = require('./markdown');
+
 module.exports = {
 	loadHelpers
 };
 
 const TICK = chalk.bold.green(figures.tick);
 const CROSS = chalk.bold.red(figures.cross);
+const WARN = chalk.bold.red(figures.warning);
 
 function loadHelpers(srcHelpers) {
 	if (!sander.existsSync(srcHelpers)) {
@@ -20,6 +23,11 @@ function loadHelpers(srcHelpers) {
 		dirname: path.resolve(srcHelpers),
 		map: name => name.replace(/-([a-z])/g, (m, c) => c.toUpperCase())
 	});
+	if (typeof helpers.markdown === 'undefined') {
+		helpers.markdown = renderMarkdown;
+	} else {
+		console.log(`  ${WARN} - building markdown is overwritten`);
+	}
 	return validateHelpers(helpers);
 }
 
