@@ -26,11 +26,11 @@ function logResult(promise) {
 
 function build(opts) {
 	const {srcPages, srcTemplates, srcStatics, srcHelpers, dest, destStatics, vars, disableValidation,
-		redirectMap, scopedCss, templateImport} = opts;
+		redirectMap, scopedCss, cssVariables, templateImport} = opts;
 	const promise =
 		sander.copydir(path.join(process.cwd(), srcStatics)).to(path.join(process.cwd(), destStatics))
 			.catch(() => {/* just ignore missing statics folder */})
-			.then(() => createTemplates(srcTemplates, srcHelpers))
+			.then(() => createTemplates(srcTemplates, srcHelpers, {cssVariables}))
 			.then(components => mixinExternalTemplates(templateImport, components))
 			.then(components => globby([srcPages]).then(filepaths => [components, filepaths]))
 			.then(([components, filepaths]) => globby([path.join(destStatics, '**')])
@@ -43,7 +43,7 @@ function build(opts) {
 				})
 				.then(statics => [components, filepaths, statics]))
 			.then(([components, filepaths, statics]) =>
-				renderPages(filepaths, dest, {components, vars, statics, disableValidation, scopedCss})
+				renderPages(filepaths, dest, {components, vars, statics, disableValidation, cssVariables})
 					.then(pageStylesheets => {
 						if (scopedCss) {
 							return sander.writeFile(scopedCss,

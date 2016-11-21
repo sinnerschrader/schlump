@@ -13,7 +13,7 @@
     "release": "standard-version --no-verify",
     "postrelease": "git push --follow-tags origin master && npm publish",
     "presite": "rimraf ./docs/* && lessc --clean-css ./node_modules/elemental/less/elemental.less docs/statics/elemental.styles.css",
-    "site": "./src/cli.js --src ./site --dest ./docs --var.foo=bar --scoped-css=./docs/statics/scoped.css --template-import='elemental:UI'",
+    "site": "./src/cli.js --src ./site --dest ./docs --var.foo=bar --scoped-css=./docs/statics/scoped.css --css-variables --template-import='elemental:UI'",
     "watch:site": "chokidar '{index,cli}.js' 'src/**' 'site/**' --initial --command 'npm run site'",
     "watch:test": "npm test -- --watch"
   },

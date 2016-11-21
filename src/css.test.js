@@ -1,7 +1,7 @@
 const test = require('ava');
 const {stripIndent} = require('common-tags');
 
-const {createScopedCss} = require('./css');
+const {getMarkup, createScopedCss} = require('./css');
 
 test('createScopedCss should handle the first scoped style block', t => {
 	const input = stripIndent`
@@ -18,7 +18,7 @@ test('createScopedCss should handle the first scoped style block', t => {
 		</style>
 	`;
 
-	const [actual] = createScopedCss(input, 'name', 'file');
+	const actual = getMarkup(input);
 
 	t.is(actual, expected);
 });
@@ -38,7 +38,7 @@ test('createScopedCss should handle only scoped style block', t => {
 		</style>
 	`;
 
-	const [actual] = createScopedCss(input, 'name', 'file');
+	const actual = getMarkup(input, 'name', 'file');
 
 	t.is(actual, expected);
 });
@@ -58,7 +58,7 @@ test('createScopedCss should add scoped variables to the CSSOM', t => {
 		['--second-variable', '48px']
 	]);
 
-	const [, {vars: actual}] = createScopedCss(input, 'name', 'file');
+	const [, actual] = createScopedCss(input, 'name', 'file');
 
 	t.deepEqual(actual, expected);
 });
@@ -74,7 +74,7 @@ test('createScopedCss should replace CSS vars with values from given scope', t =
 		</style>
 	`;
 	const expected = stripIndent`
-		.name-selector {
+		.name-962618004-selector {
 		  --first-variable: red;
 		  color: red;
 		  background-color: blue;
@@ -82,7 +82,7 @@ test('createScopedCss should replace CSS vars with values from given scope', t =
 	`;
 
 	const vars = new Map([['--second-variable', 'blue']]);
-	const [, , actual] = createScopedCss(input, {ns: 'name', vars}, 'file');
+	const [,, actual] = createScopedCss(input, {ns: 'name', vars}, 'file', true);
 
 	t.deepEqual(actual, expected);
 });
@@ -109,7 +109,7 @@ test('createScopedCss should return locally scoped css vars', t => {
 		['--third-variable', 'yellow']
 	]);
 
-	const [, {vars: actual}] = createScopedCss(inputHtml, inputScope, 'file');
+	const [, actual] = createScopedCss(inputHtml, inputScope, 'file');
 
 	t.deepEqual(actual, expected);
 });

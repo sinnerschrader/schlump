@@ -38,11 +38,11 @@ function getDestinationPath(filepath, dest) {
  *                 disableValidation true to disable sanity checks
  * @returns
  */
-function renderPages(filepaths, dest, {components, vars, statics, disableValidation}) {
+function renderPages(filepaths, dest, {components, vars, statics, disableValidation, cssVariables}) {
 	console.log(`\nGenerating pages...`);
 	return Promise.all(filepaths.map(filepath => {
 		return sander.readFile(filepath)
-			.then(content => renderPage(content, filepath, {components, vars, dest}))
+			.then(content => renderPage(content, filepath, {components, vars, dest, cssVariables}))
 			.then(([html, destinationPath, cssParts]) => sander.writeFile(destinationPath, html)
 				.then(() => [destinationPath, cssParts]))
 			.then(([destinationPath, cssParts]) => {
@@ -61,10 +61,10 @@ function deprecatedGlobals(target, name, filepath) {
 	return target[name];
 }
 
-function renderPage(content, filepath, {components, vars, dest}) {
+function renderPage(content, filepath, {components, vars, dest, cssVariables}) {
 	const parsed = matter(content.toString());
 	const destinationPath = getDestinationPath(parsed.data.route || filepath, dest);
-	const pageComponent = createPageComponent(vars, filepath, parsed, components);
+	const pageComponent = createPageComponent({vars, filepath, parsed, components, cssVariables});
 	const cssParts = [];
 	const sandbox = Object.assign(
 		{},
@@ -84,7 +84,7 @@ function renderPage(content, filepath, {components, vars, dest}) {
 	return [`<!DOCTYPE html>${ReactDOM.renderToStaticMarkup(sandbox.__html__)}`, destinationPath, cssParts.join('\n')];
 }
 
-function createPageComponent(vars, filepath, parsed, components) {
+function createPageComponent({vars, filepath, parsed, components, cssVariables}) {
 	const pageName = filepath.replace(/[./]/g, '-').replace(/^--/, '');
 	// TODO: Add helpers here
 	const pageComponentSandbox = {
@@ -95,7 +95,7 @@ function createPageComponent(vars, filepath, parsed, components) {
 		frontmatter: parsed.data
 	};
 	return createReactComponent(filepath, components, pageComponentSandbox,
-		{name: uppercaseFirst(camelcase(pageName)), code: parsed.content}).Component;
+		{name: uppercaseFirst(camelcase(pageName)), code: parsed.content, cssVariables}).Component;
 }
 
 function createDecoratedRootComponent(Page, cssScope, cssParts) {

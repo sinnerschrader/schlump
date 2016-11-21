@@ -4,8 +4,22 @@ const decamelize = require('decamelize');
 
 module.exports = {
 	createScopedCss,
-	combineCss
+	combineCss,
+	getMarkup
 };
+
+// https://regex101.com/r/EFULGo/2
+const styleMatcher = /<style(?:.+)scoped(?:.*)>((?:.|[\r\n])*?)<\/style>/i;
+
+/**
+ * Returns the markup part of the combined css and html source.
+ *
+ * @param {string} code Source to extract markup from
+ * @returns {string} Markup of the given source
+ */
+function getMarkup(code) {
+	return code.replace(styleMatcher, '').trim();
+}
 
 /**
  * Strips scoped style from html and return html and metadata.
@@ -13,27 +27,27 @@ module.exports = {
  * @param {string} html HTML input source
  * @param {Object|string} scope Namespace for generated classNames
  * @param {string?} filepath Input file path (mainly for debugging)
+ * @param {boolean} cssVariables True if css-variables support should be enabled
  * @returns [html: string, CSSOM: {classNames: any, vars: any}, css: string]
  */
-function createScopedCss(html, scope, filepath) {
+function createScopedCss(html, scope, filepath, cssVariables) {
 	scope = typeof scope === 'string' ? {ns: scope, vars: new Map()} : scope;
 
-	// https://regex101.com/r/EFULGo/2
-	const styleMatcher = /<style(?:.+)scoped(?:.*)>((?:.|[\r\n])*?)<\/style>/i;
 	const style = html.match(styleMatcher);
-	html = html.replace(styleMatcher, '');
 	if (!style) {
-		return [html, {classNames: {}, vars: scope.vars}, ''];
+		return [{}, scope.vars, ''];
 	}
 	const cssom = css.parse(style[1], {source: filepath});
-	cssom.vars = new Map(scope.vars.entries());
-	getVariables(cssom).forEach((value, key) => cssom.vars.set(key, value));
+	const vars = new Map(scope.vars.entries());
+	getVariables(cssom).forEach((value, key) => vars.set(key, value));
 
-	resolveScopeVariables(cssom, cssom.vars);
+	if (cssVariables) {
+		resolveScopeVariables(cssom, vars);
+	}
 	const hash = createHash(css.stringify(cssom));
-	cssom.classNames = getClassNames(`${scope.ns}-${hash}`, cssom);
+	const classNames = getClassNames(`${scope.ns}-${hash}`, cssom);
 
-	return [html.trim(), cssom, css.stringify(cssom)];
+	return [classNames, vars, css.stringify(cssom)];
 }
 
 function createHash(input) {

@@ -7,7 +7,7 @@ const uppercaseFirst = require('upper-case-first');
 const React = require('react');
 const matter = require('gray-matter');
 
-const {createScopedCss} = require('./css');
+const {getMarkup, createScopedCss} = require('./css');
 const {loadHelpers} = require('./helpers');
 const {transformJsx, evaluateHelpers} = require('./jsx');
 
@@ -16,7 +16,7 @@ module.exports = {
 	createReactComponent
 };
 
-function createTemplates(srcTemplates, srcHelpers) {
+function createTemplates(srcTemplates, srcHelpers, {cssVariables}) {
 	const helpers = loadHelpers(srcHelpers);
 	// Create component object here and add all components when created to have the reference already and
 	// resolve against it during runtime
@@ -26,7 +26,7 @@ function createTemplates(srcTemplates, srcHelpers) {
 			return Promise.all(filepaths.map(filepath => {
 				return sander.readFile(filepath)
 					.then(content =>
-						createTemplate(componentRegistry, helpers, filepath, content.toString()));
+						createTemplate({components: componentRegistry, helpers, filepath, code: content.toString(), cssVariables}));
 			}))
 			.then(components => {
 				return components.reduce((all, comp) => {
@@ -37,16 +37,16 @@ function createTemplates(srcTemplates, srcHelpers) {
 		});
 }
 
-function createTemplate(components, helpers, filepath, code) {
+function createTemplate({components, helpers, filepath, code, cssVariables}) {
 	const parsed = matter(code);
 	const name = parsed.data.name || uppercaseFirst(camelcase(path.basename(filepath, '.html')));
-	return createReactComponent(filepath, components, {helpers}, {name, code: parsed.content});
+	return createReactComponent(filepath, components, {helpers}, {name, code: parsed.content, cssVariables});
 }
 
-function createReactComponent(filepath, components, sandboxExtras, {name, code}) {
-	const [html] = createScopedCss(code, name, filepath);
+function createReactComponent(filepath, components, sandboxExtras, {name, code, cssVariables}) {
+	const html = getMarkup(code);
 	const {helpers: jsxHelpers, statement} = transformJsx(html);
-	const sandbox = setupSandbox(components, sandboxExtras, jsxHelpers, createLocalStyleFactory(code, name, filepath));
+	const sandbox = setupSandbox(components, sandboxExtras, jsxHelpers, createLocalStyleFactory(code, name, filepath, cssVariables));
 	const opts = {
 		filename: filepath,
 		displayErrors: true
@@ -99,9 +99,9 @@ function setupSandbox(components, sandboxExtras, jsxHelpers, getLocalStyle) {
 	return new Proxy(proxyTarget, proxyHandler);
 }
 
-function createLocalStyleFactory(htmlSource, ns, filepath) {
+function createLocalStyleFactory(htmlSource, ns, filepath, cssVariables) {
 	return context => {
-		const [, {classNames, vars}, css] = createScopedCss(htmlSource, {ns, vars: context.scope.get()}, filepath);
+		const [classNames, vars, css] = createScopedCss(htmlSource, {ns, vars: context.scope.get()}, filepath, cssVariables);
 		context.scope.set(vars);
 		context.scope.css(css);
 		return classNames;
