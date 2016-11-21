@@ -38,11 +38,11 @@ function getDestinationPath(filepath, dest) {
  *                 disableValidation true to disable sanity checks
  * @returns
  */
-function renderPages(filepaths, dest, {components, vars, statics, disableValidation, cssVariables}) {
+function renderPages(filepaths, dest, {templates, vars, statics, disableValidation, cssVariables}) {
 	console.log(`\nGenerating pages...`);
 	return Promise.all(filepaths.map(filepath => {
 		return sander.readFile(filepath)
-			.then(content => renderPage(content, filepath, {components, vars, dest, cssVariables}))
+			.then(content => renderPage(content, filepath, {templates, vars, dest, cssVariables}))
 			.then(([html, destinationPath, cssParts]) => sander.writeFile(destinationPath, html)
 				.then(() => [destinationPath, cssParts]))
 			.then(([destinationPath, cssParts]) => {
@@ -61,14 +61,14 @@ function deprecatedGlobals(target, name, filepath) {
 	return target[name];
 }
 
-function renderPage(content, filepath, {components, vars, dest, cssVariables}) {
+function renderPage(content, filepath, {templates, vars, dest, cssVariables}) {
 	const parsed = matter(content.toString());
 	const destinationPath = getDestinationPath(parsed.data.route || filepath, dest);
-	const pageComponent = createPageComponent({vars, filepath, parsed, components, cssVariables});
+	const pageComponent = createPageComponent({vars, filepath, parsed, templates, cssVariables});
 	const cssParts = [];
 	const sandbox = Object.assign(
 		{},
-		components,
+		templates,
 		{
 			React,
 			__html__: undefined,
@@ -84,7 +84,7 @@ function renderPage(content, filepath, {components, vars, dest, cssVariables}) {
 	return [`<!DOCTYPE html>${ReactDOM.renderToStaticMarkup(sandbox.__html__)}`, destinationPath, cssParts.join('\n')];
 }
 
-function createPageComponent({vars, filepath, parsed, components, cssVariables}) {
+function createPageComponent({vars, filepath, parsed, templates, cssVariables}) {
 	const pageName = filepath.replace(/[./]/g, '-').replace(/^--/, '');
 	// TODO: Add helpers here
 	const pageComponentSandbox = {
@@ -94,7 +94,7 @@ function createPageComponent({vars, filepath, parsed, components, cssVariables})
 		props: vars,
 		frontmatter: parsed.data
 	};
-	return createReactComponent(filepath, components, pageComponentSandbox,
+	return createReactComponent(filepath, templates, pageComponentSandbox,
 		{name: uppercaseFirst(camelcase(pageName)), code: parsed.content, cssVariables}).Component;
 }
 

@@ -18,35 +18,35 @@ module.exports = {
 
 function createTemplates(srcTemplates, srcHelpers, {cssVariables}) {
 	const helpers = loadHelpers(srcHelpers);
-	// Create component object here and add all components when created to have the reference already and
+	// Create templates object here and add all templates when created to have the reference already and
 	// resolve against it during runtime
-	const componentRegistry = {};
+	const templateRegistry = {};
 	return globby([srcTemplates])
 		.then(filepaths => {
 			return Promise.all(filepaths.map(filepath => {
 				return sander.readFile(filepath)
 					.then(content =>
-						createTemplate({components: componentRegistry, helpers, filepath, code: content.toString(), cssVariables}));
+						createTemplate({templates: templateRegistry, helpers, filepath, code: content.toString(), cssVariables}));
 			}))
-			.then(components => {
-				return components.reduce((all, comp) => {
+			.then(templates => {
+				return templates.reduce((all, comp) => {
 					all[comp.name] = comp.Component;
 					return all;
-				}, componentRegistry);
+				}, templateRegistry);
 			});
 		});
 }
 
-function createTemplate({components, helpers, filepath, code, cssVariables}) {
+function createTemplate({templates, helpers, filepath, code, cssVariables}) {
 	const parsed = matter(code);
 	const name = parsed.data.name || uppercaseFirst(camelcase(path.basename(filepath, '.html')));
-	return createReactComponent(filepath, components, {helpers}, {name, code: parsed.content, cssVariables});
+	return createReactComponent(filepath, templates, {helpers}, {name, code: parsed.content, cssVariables});
 }
 
-function createReactComponent(filepath, components, sandboxExtras, {name, code, cssVariables}) {
+function createReactComponent(filepath, templates, sandboxExtras, {name, code, cssVariables}) {
 	const html = getMarkup(code);
 	const {helpers: jsxHelpers, statement} = transformJsx(html);
-	const sandbox = setupSandbox(components, sandboxExtras, jsxHelpers, createLocalStyleFactory(code, name, filepath, cssVariables));
+	const sandbox = setupSandbox(templates, sandboxExtras, jsxHelpers, createLocalStyleFactory(code, name, filepath, cssVariables));
 	const opts = {
 		filename: filepath,
 		displayErrors: true
@@ -68,7 +68,7 @@ function createReactComponent(filepath, components, sandboxExtras, {name, code, 
 	};
 }
 
-function setupSandbox(components, sandboxExtras, jsxHelpers, getLocalStyle) {
+function setupSandbox(templates, sandboxExtras, jsxHelpers, getLocalStyle) {
 	if (sandboxExtras.props) {
 		sandboxExtras.sandboxProps = sandboxExtras.props;
 	}
@@ -78,8 +78,8 @@ function setupSandbox(components, sandboxExtras, jsxHelpers, getLocalStyle) {
 		 */
 		get: function (target, name) {
 			// Check if we have a component with this name
-			if (components[name]) {
-				return components[name];
+			if (templates[name]) {
+				return templates[name];
 			}
 			return target[name];
 		}
