@@ -10,7 +10,7 @@ const matter = require('gray-matter');
 const {createScopedCss} = require('./css');
 const {loadHelpers} = require('./helpers');
 const {transformJsx, evaluateHelpers} = require('./jsx');
-const {Markdown} = require('./markdown');
+const {Markdown, wrapMarkdown} = require('./markdown');
 
 module.exports = {
 	createReactComponents
@@ -41,7 +41,11 @@ function createReactComponents(srcTemplates, srcHelpers) {
 
 function createReactComponent(lazyComponentRegistry, helpers, filepath, code) {
 	const parsed = matter(code);
-	const name = parsed.data.name || uppercaseFirst(camelcase(path.basename(filepath, '.html')));
+	const ext = path.extname(filepath);
+	const name = parsed.data.name || uppercaseFirst(camelcase(path.basename(filepath, ext)));
+	if (ext === '.md') {
+		parsed.content = wrapMarkdown(parsed.content);
+	}
 	const [html, cssom, scopedCss] = createScopedCss(parsed.content, name, filepath);
 	const {helpers: jsxHelpers, statement} = transformJsx(html);
 	const proxyHandler = {

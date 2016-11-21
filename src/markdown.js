@@ -8,15 +8,27 @@ const parser = new CommonMark.Parser();
 const renderer = new ReactRenderer();
 
 module.exports = {
-	renderMarkdown,
+	renderMarkdownFile,
+	wrapMarkdown,
 	Markdown
 };
 
-function renderMarkdown(filepath) {
+function renderMarkdownFile(filepath) {
 	const content = sander.readFileSync(path.join(process.cwd(), filepath)).toString();
-	return renderer.render(parser.parse(content));
+	return renderMarkdown(content);
+}
+
+function renderMarkdown(text) {
+	return renderer.render(parser.parse(text));
 }
 
 function Markdown(props) {
-	return React.createElement('div', undefined, renderMarkdown(props.file));
+	const result = props.file ? renderMarkdownFile(props.file) : renderMarkdown(props.text);
+	return React.createElement('div', undefined, result);
+}
+
+function wrapMarkdown(content) {
+	return `
+		<Markdown text={'${content.replace(/[\r\n]/g, '\\n')}'}/>
+	`;
 }
