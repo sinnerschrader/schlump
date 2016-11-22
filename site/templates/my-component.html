@@ -1,4 +1,9 @@
 ---
 name: MyComponent
 ---
-<div>{helpers.loremIpsum(props.message)}</div>
+<style scoped>
+.colored {
+	color: var(--main-red);
+}
+</style>
+<div className={style.colored}>{helpers.loremIpsum(props.message)}</div>

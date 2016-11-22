@@ -4,7 +4,9 @@ name: WithStyle
 <style scoped>
 /* comment */
 .styled-container {
+	--main-red: blue;
 	border: 1px solid darkgreen;
+	background-color: var(--main-yellow);
 }
 </style>
 <div className={style.styledContainer}>

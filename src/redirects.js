@@ -1,7 +1,7 @@
 const sander = require('sander');
 const chalk = require('chalk');
 const figures = require('figures');
-const {/* renderPages, */getDestinationPath} = require('./renderer');
+const {getDestinationPath} = require('./pages');
 
 module.exports = {
 	createRedirects

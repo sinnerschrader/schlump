@@ -3,10 +3,9 @@ const globby = require('globby');
 const sander = require('sander');
 const chalk = require('chalk');
 
-const {renderPages} = require('./renderer');
-const {createReactComponents} = require('./components');
+const {renderPages} = require('./pages');
+const {createTemplates} = require('./templates');
 const {createRedirects} = require('./redirects');
-const {combineCss} = require('./css');
 const {mixinExternalTemplates} = require('./external-templates');
 
 module.exports = {
@@ -27,14 +26,14 @@ function logResult(promise) {
 
 function build(opts) {
 	const {srcPages, srcTemplates, srcStatics, srcHelpers, dest, destStatics, vars, disableValidation,
-		redirectMap, scopedCss, templateImport} = opts;
+		redirectMap, scopedCss, cssVariables, templateImport} = opts;
 	const promise =
 		sander.copydir(path.join(process.cwd(), srcStatics)).to(path.join(process.cwd(), destStatics))
 			.catch(() => {/* just ignore missing statics folder */})
-			.then(() => createReactComponents(srcTemplates, srcHelpers))
-			.then(components => mixinExternalTemplates(templateImport, components))
-			.then(components => globby([srcPages]).then(filepaths => [components, filepaths]))
-			.then(([components, filepaths]) => globby([path.join(destStatics, '**')])
+			.then(() => createTemplates(srcTemplates, srcHelpers, {cssVariables}))
+			.then(templates => mixinExternalTemplates(templateImport, templates))
+			.then(templates => globby([srcPages]).then(filepaths => [templates, filepaths]))
+			.then(([templates, filepaths]) => globby([path.join(destStatics, '**')])
 				.then(statics => {
 					// If we need to write css, then implicitly count it to static resources
 					if (scopedCss) {
@@ -42,15 +41,16 @@ function build(opts) {
 					}
 					return statics;
 				})
-				.then(statics => [components, filepaths, statics]))
-			.then(([components, filepaths, statics]) =>
-				renderPages(filepaths, dest, {components, vars, statics, disableValidation, scopedCss})
+				.then(statics => [templates, filepaths, statics]))
+			.then(([templates, filepaths, statics]) =>
+				renderPages(filepaths, dest, {templates, vars, statics, disableValidation, cssVariables})
 					.then(pageStylesheets => {
 						if (scopedCss) {
-							return sander.writeFile(scopedCss, combineCss(components, pageStylesheets));
+							const rules = pageStylesheets.join('\n').split('}').map(rule => rule.trim() + '}');
+							const uniqueRules = Array.from(new Set(rules)).join('\n');
+							return sander.writeFile(scopedCss, uniqueRules);
 						}
-					})
-					.then(() => [components, statics]))
-			.then(([components, statics]) => createRedirects(redirectMap, dest, {components, vars, statics, disableValidation}));
+					}))
+			.then(() => createRedirects(redirectMap, dest));
 	return logResult(promise);
 }
