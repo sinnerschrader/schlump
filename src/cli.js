@@ -27,6 +27,7 @@ const cli = meow(`
 		--disable-validation   Disable html validation (no link and resource checking)
 		--redirect-map         A json file with key value pairs of url-path (source) and full qualifed urls (target)
 		--scoped-css           Path of the file to write all scoped css to
+		--css-variables        Enable support for css-variables
 		--template-import='<file-or-node-module-path>[:<namespace>]'
 		                       Imports the react-components from the given path at the given namespace
 `, {
@@ -49,6 +50,7 @@ function main(flags) {
 		disableValidation: flags.disableValidation,
 		redirectMap: flags.redirectMap,
 		scopedCss: flags.scopedCss,
+		cssVariables: flags.cssVariables,
 		templateImport: flags.templateImport
 	};
 

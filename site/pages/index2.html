@@ -12,10 +12,11 @@ route: /index2.html
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcecfc', endColorstr='#ff7cd8',GradientType=0 ); /* IE6-9 */
 }
 </style>
-<Layout {...frontmatter} base="." scopedCss={scopedCss}>
+<Layout {...frontmatter} base=".">
 	<div className={style.secondPage}>
 		<MyComponent message={'foo=' + props.foo}/>
 		<WithStyle/>
+		<MyComponent message={'foo2=' + props.foo}/>
 	</div>
 	<a href="./index.html">Link to page 1</a>
 </Layout>

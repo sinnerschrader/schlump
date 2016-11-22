@@ -56,6 +56,7 @@ The result is written into the dist folder.
         --disable-validation   Disable html validation (no link and resource checking)
         --redirect-map         A json file with key value pairs of url-path (source) and full qualifed urls (target)
         --scoped-css           Path of the file to write all scoped css to
+        --css-variables        Enable support for css-variables
         --template-import='<file-or-node-module-path>[:<namespace>]'
                                Imports the react-components from the given path at the given namespace
 
@@ -167,6 +168,10 @@ to `https://github.com/sinnerschrader/schlump`.
 Pages and Templates could have a scoped css tag which contains the styles of that component.
 Only simple selectors are possible which implicitly means that the style rules are scoped to that component.
 
+For ease of use and to keep templates dry and reusable css-variables have been implemented.
+That includes full support for inheritance/scopeing. (__Note:__ There is no interoperability between javascript and css.
+This means it is not possible to dynamically set variables.)
+
 ```html
 ---
 name: Element
@@ -174,6 +179,7 @@ name: Element
 <style scoped>
 .element {
     color: blue;
+    background-color: var(--common-background-color);
 }
 .headline {
     color: green;
