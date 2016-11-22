@@ -79,7 +79,7 @@ text: Content!
 
 ## Templates
 
-Templates for schlump are JSX files (only the JSX code without JavaScript boilerplate).
+Templates for schlump are either JSX files (only the JSX code without JavaScript boilerplate), SVG files or Markdown files.
 All templates are stateless function components which could have as well a frontmatter preamble.
 
 The component name is either given in frontmatter as name or derived from the file name.
