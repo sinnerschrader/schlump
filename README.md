@@ -198,7 +198,8 @@ name: Element
 
 ## Template Imports
 
-With the option `--template-import` it is possible to integrate external [React](https://reactjs.com) component
+With the option `--template-import` it is possible to integrate external [React](https://reactjs.com) 
+
 libraries (e.g. [elemental ui](http://elemental-ui.com/)) into schlump sites.
 
 The libraries are either referenced from node_modules (e.g. `elemental`) or by relative path
@@ -220,8 +221,8 @@ Afterwards all components of the library could be used with the given namespace.
 The option could occurr multiple times on the cli. If there are name clashes in the namespace and module names, the
 last given option overwrites former imports.
 
-If there is no namespace given, then the library is imported into the default schlump component space. But it is not
-possible to overwrite local schlump components by an imported library.
+If there is no namespace given, then the library is imported into the default schlump template space. But it is not
+possible to overwrite local schlump templates by an imported library.
 
 ---
 schlump is built with JavaScript and :heart: and released under the
