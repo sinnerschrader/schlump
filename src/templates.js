@@ -6,6 +6,7 @@ const camelcase = require('camelcase');
 const uppercaseFirst = require('upper-case-first');
 const React = require('react');
 const matter = require('gray-matter');
+const {Markdown, wrapMarkdown} = require('./markdown');
 
 const {getMarkup, createScopedCss} = require('./css');
 const {loadHelpers} = require('./helpers');
@@ -20,7 +21,9 @@ function createTemplates(srcTemplates, srcHelpers, {cssVariables}) {
 	const helpers = loadHelpers(srcHelpers);
 	// Create templates object here and add all templates when created to have the reference already and
 	// resolve against it during runtime
-	const templateRegistry = {};
+	const templateRegistry = {
+		Markdown
+	};
 	return globby([srcTemplates])
 		.then(filepaths => {
 			return Promise.all(filepaths.map(filepath => {
@@ -39,7 +42,11 @@ function createTemplates(srcTemplates, srcHelpers, {cssVariables}) {
 
 function createTemplate({templates, helpers, filepath, code, cssVariables}) {
 	const parsed = matter(code);
-	const name = parsed.data.name || uppercaseFirst(camelcase(path.basename(filepath, '.html')));
+	const ext = path.extname(filepath);
+	const name = parsed.data.name || uppercaseFirst(camelcase(path.basename(filepath, ext)));
+	if (ext === '.md') {
+		parsed.content = wrapMarkdown(parsed.content);
+	}
 	return createReactComponent(filepath, templates, {helpers}, {name, code: parsed.content, cssVariables});
 }
 
@@ -90,7 +97,8 @@ function setupSandbox(templates, sandboxExtras, jsxHelpers, getLocalStyle) {
 			name: undefined,
 			contextStackFactory,
 			getLocalStyle,
-			Object
+			Object,
+			console
 		},
 		sandboxExtras,
 		evaluateHelpers(jsxHelpers)

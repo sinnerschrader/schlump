@@ -4,7 +4,7 @@ const requireAll = require('require-all');
 const chalk = require('chalk');
 const figures = require('figures');
 
-const {renderMarkdownFile} = require('./markdown');
+const {renderMarkdown} = require('./markdown');
 
 module.exports = {
 	loadHelpers
@@ -24,7 +24,7 @@ function loadHelpers(srcHelpers) {
 		map: name => name.replace(/-([a-z])/g, (m, c) => c.toUpperCase())
 	});
 	if (typeof helpers.markdown === 'undefined') {
-		helpers.markdown = renderMarkdownFile;
+		helpers.markdown = renderMarkdown;
 	} else {
 		console.log(`  ${WARN} - building markdown is overwritten`);
 	}

@@ -1,0 +1,26 @@
+.layout-771144403-html {
+  --main-red: rgb(238, 29, 35);
+  --main-yellow: rgb(255, 220, 1);}
+.my-component-100140932-colored {
+  color: rgb(238, 29, 35);}
+.site-pages-index2-html--469062578-second-page {
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fcecfc+0,fba6e1+50,fd89d7+51,ff7cd8+100;Pink+Gloss+%232 */
+  background: rgb(252,236,252);
+  /* Old browsers */
+  background: -moz-linear-gradient(top,  rgba(252,236,252,1) 0%, rgba(251,166,225,1) 50%, rgba(253,137,215,1) 51%, rgba(255,124,216,1) 100%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(top,  rgba(252,236,252,1) 0%,rgba(251,166,225,1) 50%,rgba(253,137,215,1) 51%,rgba(255,124,216,1) 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom,  rgba(252,236,252,1) 0%,rgba(251,166,225,1) 50%,rgba(253,137,215,1) 51%,rgba(255,124,216,1) 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcecfc', endColorstr='#ff7cd8',GradientType=0 );
+  /* IE6-9 */}
+/* comment */
+
+.with-style-806350838-styled-container {
+  --main-red: blue;
+  border: 1px solid darkgreen;
+  background-color: rgb(255, 220, 1);}
+.my-component--727887898-colored {
+  color: blue;}
+}
