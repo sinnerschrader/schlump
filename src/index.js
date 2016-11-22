@@ -46,8 +46,9 @@ function build(opts) {
 				renderPages(filepaths, dest, {templates, vars, statics, disableValidation, cssVariables})
 					.then(pageStylesheets => {
 						if (scopedCss) {
-							return sander.writeFile(scopedCss,
-								Array.from(new Set(pageStylesheets.join('\n').split('}').map(rule => rule.trim() + '}'))).join('\n'));
+							const rules = pageStylesheets.join('\n').split('}').map(rule => rule.trim() + '}');
+							const uniqueRules = Array.from(new Set(rules)).join('\n');
+							return sander.writeFile(scopedCss, uniqueRules);
 						}
 					}))
 			.then(() => createRedirects(redirectMap, dest));

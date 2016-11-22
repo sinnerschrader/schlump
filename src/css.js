@@ -50,6 +50,7 @@ function createScopedCss(html, scope, filepath, cssVariables) {
 	return [classNames, vars, css.stringify(cssom)];
 }
 
+// Based on http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
 function createHash(input) {
 	let hash = 0;
 	if (input.length === 0) {
