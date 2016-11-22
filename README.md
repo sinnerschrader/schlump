@@ -169,7 +169,7 @@ Pages and Templates could have a scoped css tag which contains the styles of tha
 Only simple selectors are possible which implicitly means that the style rules are scoped to that component.
 
 For ease of use and to keep templates dry and reusable css-variables have been implemented.
-That includes full support for inheritance/scopeing. (__Note:__ There is no interoperability between javascript and css.
+That includes full support for inheritance/scoping. (__Note:__ There is no interoperability between javascript and css.
 This means it is not possible to dynamically set variables.)
 
 ```html
