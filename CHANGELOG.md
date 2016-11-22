@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.14.0"></a>
+# [0.14.0](https://github.com/sinnerschrader/schlump/compare/v0.13.2...v0.14.0) (2016-11-22)
+
+
+### Bug Fixes
+
+* add support for css comments ([27cb49c](https://github.com/sinnerschrader/schlump/commit/27cb49c))
+* fix svg markup ([f98fb1c](https://github.com/sinnerschrader/schlump/commit/f98fb1c))
+* handle css comments gracefully ([8bf4ad4](https://github.com/sinnerschrader/schlump/commit/8bf4ad4))
+* leverage resolve-from ([186a4ba](https://github.com/sinnerschrader/schlump/commit/186a4ba))
+* resolve relative external template sources from cwd ([374a7ac](https://github.com/sinnerschrader/schlump/commit/374a7ac))
+
+### Features
+
+* add cli switch and option to css-vars ([f4e48b9](https://github.com/sinnerschrader/schlump/commit/f4e48b9))
+* add scoped css for pages ([f4c0568](https://github.com/sinnerschrader/schlump/commit/f4c0568))
+* add support for markdown rendering ([da8ec70](https://github.com/sinnerschrader/schlump/commit/da8ec70))
+* allow markdown templates ([c38997b](https://github.com/sinnerschrader/schlump/commit/c38997b))
+* extract variables from scoped css ([3fb3567](https://github.com/sinnerschrader/schlump/commit/3fb3567))
+* remove duplicate rules from css ([7fe75fa](https://github.com/sinnerschrader/schlump/commit/7fe75fa))
+* render scoped css ([d700e42](https://github.com/sinnerschrader/schlump/commit/d700e42))
+* replace variables with scoped values ([0a969f2](https://github.com/sinnerschrader/schlump/commit/0a969f2))
+* support external component libraries ([06f2095](https://github.com/sinnerschrader/schlump/commit/06f2095))
+* wip creating runtime scope ([b350c6b](https://github.com/sinnerschrader/schlump/commit/b350c6b))
+* write custom css and classnames ([b6d776b](https://github.com/sinnerschrader/schlump/commit/b6d776b))
+
+
+
 <a name="0.13.2"></a>
 ## [0.13.2](https://github.com/sinnerschrader/schlump/compare/v0.13.1...v0.13.2) (2016-11-17)
 
