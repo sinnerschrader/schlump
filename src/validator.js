@@ -1,5 +1,4 @@
 const path = require('path');
-const sander = require('sander');
 const htmlparser = require('htmlparser');
 const {select} = require('soupselect');
 const css = require('css');
@@ -8,8 +7,8 @@ module.exports = {
 	validatePages
 };
 
-function validatePages(destinationPath, files, statics) {
-	return Promise.all(files.map(filepath => sander.readFile(filepath)))
+function validatePages(host, destinationPath, files, statics) {
+	return Promise.all(files.map(filepath => host.readFile(filepath)))
 		.then(contents => contents.map(content => parseHtml(content)))
 		.then(doms => {
 			doms.forEach((dom, index) => checkAnchor(dom, files[index], destinationPath, files));
