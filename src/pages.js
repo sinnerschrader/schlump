@@ -86,7 +86,6 @@ function renderPage(content, filepath, {templates, vars, dest, cssVariables}) {
 
 function createPageComponent({vars, filepath, parsed, templates, cssVariables}) {
 	const pageName = filepath.replace(/[./]/g, '-').replace(/^--/, '');
-	// TODO: Add helpers here
 	const pageComponentSandbox = {
 		global: new Proxy(Object.assign({}, vars), {
 			get: (target, name) => deprecatedGlobals(target, name, filepath)

@@ -7,6 +7,7 @@
   },
   "main": "./src/index.js",
   "scripts": {
+    "linter": "xo",
     "start": "npm run watch:site",
     "test": "nyc --all --reporter lcov ./node_modules/.bin/ava",
     "commitmsg": "conventional-changelog-lint -e",
