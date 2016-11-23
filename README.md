@@ -3,6 +3,7 @@
 [![license](https://img.shields.io/github/license/sinnerschrader/schlump.svg)](https://github.com/sinnerschrader/schlump/blob/master/LICENSE)
 [![npm](https://img.shields.io/npm/v/schlump.svg)](https://www.npmjs.com/package/schlump)
 [![Build Status](https://travis-ci.org/sinnerschrader/schlump.svg?branch=master)](https://travis-ci.org/sinnerschrader/schlump)
+[![Build status](https://ci.appveyor.com/api/projects/status/th6f2l2k0t5qukjp/branch/master?svg=true)](https://ci.appveyor.com/project/KnisterPeter/schlump/branch/master)
 [![Coverage Status](https://coveralls.io/repos/github/sinnerschrader/schlump/badge.svg?branch=master)](https://coveralls.io/github/sinnerschrader/schlump?branch=master)
 [![dependencies Status](https://david-dm.org/sinnerschrader/schlump/status.svg)](https://david-dm.org/sinnerschrader/schlump)
 [![devDependencies Status](https://david-dm.org/sinnerschrader/schlump/dev-status.svg)](https://david-dm.org/sinnerschrader/schlump?type=dev)
