@@ -44,7 +44,6 @@ function checkAnchor(dom, sourcefile, destinationPath, files) {
 		.map(anchor => [anchor, toPath(anchor.attribs.href, sourcefile, destinationPath)])
 		.map(([anchor, filepath]) => [anchor, extendPath(filepath)])
 		.forEach(([anchor, filepath]) => {
-			console.log(files, filepath);
 			if (files.indexOf(filepath) === -1) {
 				const source = path.relative(destinationPath, sourcefile);
 				throw new Error(`Invalid anchor to page '${anchor.attribs.href}' found in '${source}'.`);
