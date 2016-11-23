@@ -8,7 +8,7 @@
   "main": "./src/index.js",
   "scripts": {
     "start": "npm run watch:site",
-    "test": "nyc --reporter lcov ./node_modules/.bin/ava",
+    "test": "nyc --all --reporter lcov ./node_modules/.bin/ava",
     "commitmsg": "conventional-changelog-lint -e",
     "release": "standard-version --no-verify",
     "postrelease": "git push --follow-tags origin master && npm publish",
@@ -99,7 +99,8 @@
   "nyc": {
     "exclude": [
       "node_modules",
-      "coverage"
+      "coverage",
+      "site"
     ]
   }
 }
