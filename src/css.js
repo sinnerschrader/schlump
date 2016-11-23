@@ -1,11 +1,13 @@
 const camelcase = require('camelcase');
 const css = require('css');
 const decamelize = require('decamelize');
+const selectorParser = require('postcss-selector-parser');
 
 module.exports = {
 	createScopedCss,
 	combineCss,
-	getMarkup
+	getMarkup,
+	getMatchingSelectors
 };
 
 // https://regex101.com/r/EFULGo/2
@@ -45,9 +47,11 @@ function createScopedCss(html, scope, filepath, cssVariables) {
 		resolveScopeVariables(cssom, vars);
 	}
 	const hash = createHash(css.stringify(cssom));
-	const classNames = getClassNames(`${scope.ns}-${hash}`, cssom);
+	const ns = `${decamelize(scope.ns, '-')}-${hash}`;
+	const classNames = getClassNames(ns, cssom);
+	const transformMap = rewriteSelectors(ns, cssom);
 
-	return [classNames, vars, css.stringify(cssom)];
+	return [classNames, vars, css.stringify(cssom), transformMap];
 }
 
 // Based on http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
@@ -83,20 +87,107 @@ function combineCss(templates, scopedCss) {
 	.join('\n').trim();
 }
 
-const toScopedClassName = (ns, selector) => `${decamelize(ns, '-')}-${decamelize(camelcase(selector), '-')}`;
-
 function getClassNames(ns, cssom) {
 	return cssom.stylesheet.rules
 		.filter(rule => rule.type === 'rule')
-		.reduce((rules, rule) => {
-			rules = [...rules, ...rule.selectors];
-			rule.selectors = rule.selectors.map(selector => `.${toScopedClassName(ns, selector)}`);
-			return rules;
-		}, [])
+		.reduce((selectors, rule) => [...selectors, ...rule.selectors], [])
 		.reduce((classNames, selector) => {
-			classNames[camelcase(selector)] = toScopedClassName(ns, selector);
+			const transform = selectors => {
+				selectors.each(selector => {
+					if (selector.nodes.length === 1 && selector.nodes[0].type === selectorParser.CLASS) {
+						classNames[camelcase(String(selector))] = `${ns}-${selector.nodes[0].value}`;
+					}
+				});
+			};
+			selectorParser(transform).process(selector);
 			return classNames;
 		}, {});
+}
+
+function getMatchingSelectors(domStack, selectors) {
+	const localStack = JSON.parse(JSON.stringify(domStack));
+	const getSiblings = () => localStack.length > 0 && Array.isArray(localStack[0]) ?
+		localStack : [, localStack]; // eslint-disable-line no-sparse-arrays
+	const [, siblings] = getSiblings();
+	const getCurrentNode = () => siblings[siblings.length - 1];
+
+	const matchingSelectors = [];
+
+	const isCombinatorMatching = node => {
+		switch (node.value) {
+			case '+':
+				siblings.pop();
+				return true;
+			default:
+				return false;
+		}
+	};
+
+	const isTypeMatching = node => {
+		switch (node.type) {
+			case selectorParser.TAG:
+				return node.value === getCurrentNode();
+			case selectorParser.COMBINATOR:
+				return isCombinatorMatching(node);
+			default:
+				return false;
+		}
+	};
+
+	const transform = fullSelector => {
+		return selectors => {
+			selectors.each(selector => {
+				let matching = true;
+				for (let i = selector.nodes.length; i > 0; i--) {
+					matching = isTypeMatching(selector.nodes[i - 1]);
+				}
+				if (matching) {
+					matchingSelectors.push(fullSelector);
+				}
+			});
+		};
+	};
+
+	selectors.forEach(selector => {
+		selectorParser(transform(selector)).process(selector);
+	});
+
+	return matchingSelectors;
+}
+
+function selectorTransform(ns) {
+	const map = {};
+	return {
+		map,
+		fn: selectors => {
+			selectors.each(selector => {
+				const sourceSelector = String(selector);
+				for (let i = 0, n = selector.nodes.length; i < n; i++) {
+					if (selector.nodes[i].type === selectorParser.CLASS) {
+						selector.nodes[i].replaceWith(selectorParser.className({value:
+							`${ns}-${selector.nodes[i].value}`}));
+					}
+				}
+				if (selector.last.type === selectorParser.TAG) {
+					selector.last.replaceWith(selectorParser.className({value:
+						`${ns}-${selector.last.value}`}));
+				}
+				map[sourceSelector] = String(selector.last).replace(/^\./, '');
+			});
+		}
+	};
+}
+
+function rewriteSelectors(ns, cssom) {
+	const transform = selectorTransform(ns);
+	cssom.stylesheet.rules
+		.filter(rule => rule.type === 'rule')
+		.forEach(rule => {
+			rule.selectors = rule.selectors
+				.map(selector =>
+					selectorParser(transform.fn).process(selector).result);
+		});
+	return transform.map;
 }
 
 function getDeclarations(cssom) {
