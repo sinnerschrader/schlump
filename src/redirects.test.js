@@ -15,7 +15,7 @@ test('createRedirects should write a file at source uri of a given redirect', as
 
 	await createRedirects(host, 'redirects', 'destination');
 
-	t.is(actual, expected);
+	t.is(actual.replace(/\\/g, '/'), expected);
 });
 
 test('createRedirects should write a file with a meta refresh target of a given redirect', async t => {
