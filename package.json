@@ -101,7 +101,8 @@
     "exclude": [
       "node_modules",
       "coverage",
-      "site"
+      "site",
+      "src/**.test.js"
     ]
   }
 }
