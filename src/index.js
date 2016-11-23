@@ -3,6 +3,7 @@ const globby = require('globby');
 const sander = require('sander');
 const chalk = require('chalk');
 
+const host = require('./host');
 const {renderPages} = require('./pages');
 const {createTemplates} = require('./templates');
 const {createRedirects} = require('./redirects');
@@ -51,6 +52,6 @@ function build(opts) {
 							return sander.writeFile(scopedCss, uniqueRules);
 						}
 					}))
-			.then(() => createRedirects(redirectMap, dest));
+			.then(() => createRedirects(host, redirectMap, dest));
 	return logResult(promise);
 }
