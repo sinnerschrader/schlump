@@ -44,7 +44,7 @@ function build(opts) {
 				})
 				.then(statics => [templates, filepaths, statics]))
 			.then(([templates, filepaths, statics]) =>
-				renderPages(filepaths, dest, {templates, vars, statics, disableValidation, cssVariables})
+				renderPages(filepaths, dest, {templates, vars, statics, disableValidation, cssVariables, host})
 					.then(pageStylesheets => {
 						if (scopedCss) {
 							const rules = pageStylesheets.join('\n').split('}').map(rule => rule.trim() + '}');

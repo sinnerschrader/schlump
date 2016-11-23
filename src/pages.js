@@ -38,7 +38,7 @@ function getDestinationPath(filepath, dest) {
  *                 disableValidation true to disable sanity checks
  * @returns
  */
-function renderPages(filepaths, dest, {templates, vars, statics, disableValidation, cssVariables}) {
+function renderPages(filepaths, dest, {templates, vars, statics, disableValidation, cssVariables, host}) {
 	console.log(`\nGenerating pages...`);
 	return Promise.all(filepaths.map(filepath => {
 		return sander.readFile(filepath)
@@ -51,7 +51,7 @@ function renderPages(filepaths, dest, {templates, vars, statics, disableValidati
 			});
 	}))
 	.then(pageResults => disableValidation ||
-		validatePages(dest, pageResults.map(result => result[0]), statics)
+		validatePages(host, dest, pageResults.map(result => result[0]), statics)
 			.then(() => pageResults.map(result => result[1])));
 }
 
