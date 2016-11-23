@@ -3,7 +3,7 @@
 [![license](https://img.shields.io/github/license/sinnerschrader/schlump.svg)](https://github.com/sinnerschrader/schlump/blob/master/LICENSE)
 [![npm](https://img.shields.io/npm/v/schlump.svg)](https://www.npmjs.com/package/schlump)
 [![Build Status](https://travis-ci.org/sinnerschrader/schlump.svg?branch=master)](https://travis-ci.org/sinnerschrader/schlump)
-[![Coverage Status](https://coveralls.io/repos/github/sinnerschrader/schlump/badge.svg)](https://coveralls.io/github/sinnerschrader/schlump)
+[![Coverage Status](https://coveralls.io/repos/github/sinnerschrader/schlump/badge.svg?branch=master)](https://coveralls.io/github/sinnerschrader/schlump?branch=master)
 [![dependencies Status](https://david-dm.org/sinnerschrader/schlump/status.svg)](https://david-dm.org/sinnerschrader/schlump)
 [![devDependencies Status](https://david-dm.org/sinnerschrader/schlump/dev-status.svg)](https://david-dm.org/sinnerschrader/schlump?type=dev)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
