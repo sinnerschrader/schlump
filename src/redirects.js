@@ -1,4 +1,3 @@
-const sander = require('sander');
 const chalk = require('chalk');
 const figures = require('figures');
 const {getDestinationPath} = require('./pages');
@@ -7,12 +6,12 @@ module.exports = {
 	createRedirects
 };
 
-function createRedirects(redirectMap, dest) {
+function createRedirects(host, redirectMap, dest) {
 	if (!redirectMap) {
 		return Promise.resolve();
 	}
 	console.log(`\nGenerating redirects...`);
-	return sander.readFile(redirectMap)
+	return host.readFile(redirectMap)
 		.then(content => JSON.parse(content))
 		.then(redirects => Object.keys(redirects).map(from => [from, `
 			<html>
@@ -25,7 +24,7 @@ function createRedirects(redirectMap, dest) {
 			`.replace(/(?:\n|\r|\t)/g, '')]))
 		.then(redirects => Promise.all(redirects.map(([from, html]) => {
 			const destinationPath = getDestinationPath(from, dest);
-			return sander.writeFile(destinationPath, html)
+			return host.writeFile(destinationPath, html)
 				.then(() => {
 					console.log(`  ${chalk.bold.green(figures.tick)} ${from} -> ${destinationPath}`);
 				});
