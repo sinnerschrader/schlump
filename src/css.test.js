@@ -296,3 +296,13 @@ test('getMatchingSelectors return matching decendant selectors with class', t =>
 
 	t.deepEqual(actual, expected);
 });
+
+test('getMatchingSelectors return matching complex selector', t => {
+	const input = ['body .container > div ~ span'];
+	const expected = ['body .container > div ~ span'];
+	const domStack = [[[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div'}, {tag: 'div', class: 'container'}]], [{tag: 'div'}, {tag: 'span'}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
