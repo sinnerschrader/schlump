@@ -123,7 +123,7 @@ function getMatchingSelector(domStack, selector) {
 			siblings = localStack;
 		}
 	};
-	const getCurrentNode = () => siblings ? siblings[siblings.length - 1] : '';
+	const getCurrentNode = () => siblings ? siblings[siblings.length - 1] || {} : {};
 	const toParent = () => {
 		localStack = localStack[localStack.length - 2];
 	};
@@ -163,21 +163,21 @@ function getMatchingSelector(domStack, selector) {
 	};
 
 	const isAnySiblingMatching = node => {
-		while (siblings.length > 0 && node.value !== getCurrentNode()) {
+		while (siblings.length > 0 && node.value !== getCurrentNode().tag) {
 			siblings.pop();
 		}
-		return node.value === getCurrentNode();
+		return node.value === getCurrentNode().tag;
 	};
 
 	const isMatchingSelfOrParent = node => {
 		if (parentMatchMode === 'current') {
-			return node.value === getCurrentNode();
+			return node.value === getCurrentNode().tag;
 		} else if (parentMatchMode === 'any') {
-			while (localStack && node.value !== getCurrentNode()) { // eslint-disable-line no-unmodified-loop-condition
+			while (localStack && node.value !== getCurrentNode().tag) { // eslint-disable-line no-unmodified-loop-condition
 				toParent();
 				updateCurrentSiblings();
 			}
-			return node.value === getCurrentNode();
+			return node.value === getCurrentNode().tag;
 		}
 		return false;
 	};
@@ -193,6 +193,8 @@ function getMatchingSelector(domStack, selector) {
 				return false;
 			case selectorParser.COMBINATOR:
 				return isCombinatorMatching(node);
+			case selectorParser.CLASS:
+				return (getCurrentNode().class || '').split(' ').indexOf(node.value) > -1;
 			default:
 				return false;
 		}

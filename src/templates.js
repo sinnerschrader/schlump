@@ -130,21 +130,21 @@ function customCreateElement(sandbox) {
 				getChildContext() {
 					return {
 						stack: {
-							push: name => {
-								this.domTree = this.domTree || [];
-								this.domTree.push(name);
+							push: node => {
+								this.domStack = this.domStack || [];
+								this.domStack.push(node);
 							},
 							peek: () => {
-								return [this.context.stack.peek(), this.domTree || []];
+								return [this.context.stack.peek(), this.domStack || []];
 							}
 						}
 					};
 				}
 				render() {
-					this.context.stack.push(tagOrComponent);
+					const currentNode = {tag: tagOrComponent};
+					this.context.stack.push(currentNode);
 					if (sandbox.cssMapping) {
-						const localStack = JSON.parse(JSON.stringify(this.context.stack.peek()));
-						const matchingSelectors = getMatchingSelectors(localStack, Object.keys(sandbox.cssMapping));
+						const matchingSelectors = getMatchingSelectors(this.context.stack.peek(), Object.keys(sandbox.cssMapping));
 						if (!props) {
 							props = {};
 						}
@@ -154,6 +154,17 @@ function customCreateElement(sandbox) {
 						props.className += matchingSelectors
 							.map(matchingSelector => sandbox.cssMapping[matchingSelector])
 							.join(' ');
+
+						if (props && props.className) {
+							const reverseCssMapping = Object.keys(sandbox.cssMapping)
+								.filter(name => name.indexOf(' ') === -1)
+								.filter(name => name.startsWith('.'))
+								.reduce((reverse, name) => {
+									reverse[sandbox.cssMapping[name]] = name.replace(/^./, '');
+									return reverse;
+								}, {});
+							currentNode.class = props.className.split(' ').map(className => reverseCssMapping[className]).join(' ');
+						}
 					}
 					return createElement.apply(React, [tagOrComponent, props, children, ...rest]);
 				}
@@ -198,12 +209,12 @@ function contextStackFactory(SFC) {
 					}
 				},
 				stack: {
-					push(name) {
-						this.domTree = this.domTree || [];
-						this.domTree.push(name);
+					push(node) {
+						this.domeStack = this.domeStack || [];
+						this.domeStack.push(node);
 					},
 					peek() {
-						return this.domTree || [];
+						return this.domeStack || [];
 					}
 				}
 			};
