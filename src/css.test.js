@@ -246,3 +246,13 @@ test('getMatchingSelectors return matching next and general sibling selectors', 
 
 	t.deepEqual(actual, expected);
 });
+
+test('getMatchingSelectors return matching child selectors', t => {
+	const input = ['body > p', 'body > span'];
+	const expected = ['body > span'];
+	const domStack = [[['html'], ['head', 'body']], ['div', 'span']];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});

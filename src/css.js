@@ -110,11 +110,19 @@ function getMatchingSelectors(domStack, selectors) {
 }
 
 function getMatchingSelector(domStack, selector) {
-	const localStack = JSON.parse(JSON.stringify(domStack));
-	const getSiblings = localStack => localStack.length > 0 && Array.isArray(localStack[0]) ?
-		localStack : [, localStack]; // eslint-disable-line no-sparse-arrays
-	const [, siblings] = getSiblings(localStack);
+	let localStack = JSON.parse(JSON.stringify(domStack));
+	let siblings;
+	const updateCurrentSiblings = () => {
+		if (localStack.length > 0 && Array.isArray(localStack[0])) {
+			[, siblings] = localStack;
+		} else {
+			siblings = localStack;
+		}
+	};
 	const getCurrentNode = () => siblings[siblings.length - 1];
+	const toParent = () => {
+		localStack = localStack[localStack.length - 2];
+	};
 
 	// could be 'current' or 'any'
 	let siblingMatchMode = 'current';
@@ -128,6 +136,11 @@ function getMatchingSelector(domStack, selector) {
 				return true;
 			case '~':
 				siblingMatchMode = 'any';
+				return true;
+			case '>':
+				siblingMatchMode = 'current';
+				toParent();
+				updateCurrentSiblings();
 				return true;
 			default:
 				return false;
@@ -171,6 +184,7 @@ function getMatchingSelector(domStack, selector) {
 		};
 	};
 
+	updateCurrentSiblings();
 	selectorParser(transform(selector)).process(selector);
 	return matchingSelectors;
 }
