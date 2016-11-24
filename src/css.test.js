@@ -266,3 +266,13 @@ test('getMatchingSelectors return matching selector list', t => {
 
 	t.deepEqual(actual, expected);
 });
+
+test('getMatchingSelectors return matching decendant selectors (variant >>)', t => {
+	const input = ['html >> p', 'html >> span'];
+	const expected = ['html >> span'];
+	const domStack = [[['html'], ['head', 'body']], ['div', 'span']];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});

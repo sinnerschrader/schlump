@@ -126,18 +126,28 @@ function getMatchingSelector(domStack, selector) {
 
 	// could be 'current' or 'any'
 	let siblingMatchMode = 'current';
+	let parentMatchMode = 'current';
 	const matchingSelectors = [];
 
 	const isCombinatorMatching = node => {
 		switch (node.value) {
 			case '+':
+				parentMatchMode = 'current';
 				siblingMatchMode = 'current';
 				siblings.pop();
 				return true;
 			case '~':
+				parentMatchMode = 'current';
 				siblingMatchMode = 'any';
 				return true;
 			case '>':
+				parentMatchMode = 'current';
+				siblingMatchMode = 'current';
+				toParent();
+				updateCurrentSiblings();
+				return true;
+			case '>>':
+				parentMatchMode = 'any';
 				siblingMatchMode = 'current';
 				toParent();
 				updateCurrentSiblings();
@@ -147,20 +157,33 @@ function getMatchingSelector(domStack, selector) {
 		}
 	};
 
-	const toMatchingSibling = node => {
+	const isAnySiblingMatching = node => {
 		while (siblings.length > 0 && node.value !== getCurrentNode()) {
 			siblings.pop();
 		}
 		return node.value === getCurrentNode();
 	};
 
+	const isMatchingSelfOrParent = node => {
+		if (parentMatchMode === 'current') {
+			return node.value === getCurrentNode();
+		} else if (parentMatchMode === 'any') {
+			while (node.value !== getCurrentNode()) {
+				toParent();
+				updateCurrentSiblings();
+			}
+			return node.value === getCurrentNode();
+		}
+		return false;
+	};
+
 	const isTypeMatching = node => {
 		switch (node.type) {
 			case selectorParser.TAG:
 				if (siblingMatchMode === 'current') {
-					return node.value === getCurrentNode();
+					return isMatchingSelfOrParent(node);
 				} else if (siblingMatchMode === 'any') {
-					return toMatchingSibling(node);
+					return isAnySiblingMatching(node);
 				}
 				return false;
 			case selectorParser.COMBINATOR:
