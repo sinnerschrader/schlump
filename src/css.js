@@ -113,10 +113,12 @@ function getMatchingSelector(domStack, selector) {
 	let localStack = JSON.parse(JSON.stringify(domStack));
 	let siblings;
 	const updateCurrentSiblings = () => {
+		// no localStack => no siblings
 		if (!localStack) {
 			siblings = undefined;
 			return;
 		}
+		// stack structure: [[parents], [siblings]]
 		if (localStack.length > 0 && Array.isArray(localStack[0])) {
 			[, siblings] = localStack;
 		} else {
@@ -194,7 +196,7 @@ function getMatchingSelector(domStack, selector) {
 			case selectorParser.COMBINATOR:
 				return isCombinatorMatching(node);
 			case selectorParser.CLASS:
-				return (getCurrentNode().class || '').split(' ').indexOf(node.value) > -1;
+				return (getCurrentNode().class || '').split(' ').includes(node.value);
 			default:
 				return false;
 		}
