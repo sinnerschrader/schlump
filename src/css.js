@@ -105,28 +105,51 @@ function getClassNames(ns, cssom) {
 }
 
 function getMatchingSelectors(domStack, selectors) {
+	return selectors.reduce((matchingSelectors, selector) =>
+		[...matchingSelectors, ...getMatchingSelector(domStack, selector)], []);
+}
+
+function getMatchingSelector(domStack, selector) {
 	const localStack = JSON.parse(JSON.stringify(domStack));
-	const getSiblings = () => localStack.length > 0 && Array.isArray(localStack[0]) ?
+	const getSiblings = localStack => localStack.length > 0 && Array.isArray(localStack[0]) ?
 		localStack : [, localStack]; // eslint-disable-line no-sparse-arrays
-	const [, siblings] = getSiblings();
+	const [, siblings] = getSiblings(localStack);
 	const getCurrentNode = () => siblings[siblings.length - 1];
 
+	// could be 'current' or 'any'
+	let siblingMatchMode = 'current';
 	const matchingSelectors = [];
 
 	const isCombinatorMatching = node => {
 		switch (node.value) {
 			case '+':
+				siblingMatchMode = 'current';
 				siblings.pop();
+				return true;
+			case '~':
+				siblingMatchMode = 'any';
 				return true;
 			default:
 				return false;
 		}
 	};
 
+	const toMatchingSibling = node => {
+		while (siblings.length > 0 && node.value !== getCurrentNode()) {
+			siblings.pop();
+		}
+		return node.value === getCurrentNode();
+	};
+
 	const isTypeMatching = node => {
 		switch (node.type) {
 			case selectorParser.TAG:
-				return node.value === getCurrentNode();
+				if (siblingMatchMode === 'current') {
+					return node.value === getCurrentNode();
+				} else if (siblingMatchMode === 'any') {
+					return toMatchingSibling(node);
+				}
+				return false;
 			case selectorParser.COMBINATOR:
 				return isCombinatorMatching(node);
 			default:
@@ -138,7 +161,7 @@ function getMatchingSelectors(domStack, selectors) {
 		return selectors => {
 			selectors.each(selector => {
 				let matching = true;
-				for (let i = selector.nodes.length; i > 0; i--) {
+				for (let i = selector.nodes.length; matching && i > 0; i--) {
 					matching = isTypeMatching(selector.nodes[i - 1]);
 				}
 				if (matching) {
@@ -148,10 +171,7 @@ function getMatchingSelectors(domStack, selectors) {
 		};
 	};
 
-	selectors.forEach(selector => {
-		selectorParser(transform(selector)).process(selector);
-	});
-
+	selectorParser(transform(selector)).process(selector);
 	return matchingSelectors;
 }
 

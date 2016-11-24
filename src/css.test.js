@@ -226,3 +226,23 @@ test('getMatchingSelectors return matching next sibling selectors', t => {
 
 	t.deepEqual(actual, expected);
 });
+
+test('getMatchingSelectors return matching general sibling selectors', t => {
+	const input = ['h2 + p', 'h2 ~ span', 'h3 + p'];
+	const expected = ['h2 ~ span'];
+	const domStack = [[['html'], ['head', 'body']], ['h2', 'div', 'span']];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
+
+test('getMatchingSelectors return matching next and general sibling selectors', t => {
+	const input = ['h2 + p', 'h2 + h3 ~ span', 'p + span'];
+	const expected = ['h2 + h3 ~ span', 'p + span'];
+	const domStack = [[['html'], ['head', 'body']], ['h2', 'h3', 'p', 'span']];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
