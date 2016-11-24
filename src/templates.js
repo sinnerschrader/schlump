@@ -6,7 +6,6 @@ const camelcase = require('camelcase');
 const uppercaseFirst = require('upper-case-first');
 const React = require('react');
 const matter = require('gray-matter');
-const selectorParser = require('postcss-selector-parser');
 
 const {Markdown, wrapMarkdown} = require('./markdown');
 const {getMarkup, createScopedCss, getMatchingSelectors} = require('./css');
