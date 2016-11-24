@@ -145,15 +145,17 @@ function customCreateElement(sandbox) {
 					this.context.stack.push(currentNode);
 					if (sandbox.cssMapping) {
 						const matchingSelectors = getMatchingSelectors(this.context.stack.peek(), Object.keys(sandbox.cssMapping));
-						if (!props) {
-							props = {};
+						if (matchingSelectors.length > 0) {
+							if (!props) {
+								props = {};
+							}
+							if (!props.className) {
+								props.className = '';
+							}
+							props.className += matchingSelectors
+								.map(matchingSelector => sandbox.cssMapping[matchingSelector])
+								.join(' ');
 						}
-						if (!props.className) {
-							props.className = '';
-						}
-						props.className += matchingSelectors
-							.map(matchingSelector => sandbox.cssMapping[matchingSelector])
-							.join(' ');
 
 						if (props && props.className) {
 							const reverseCssMapping = Object.keys(sandbox.cssMapping)
@@ -163,7 +165,14 @@ function customCreateElement(sandbox) {
 									reverse[sandbox.cssMapping[name]] = name.replace(/^./, '');
 									return reverse;
 								}, {});
-							currentNode.class = props.className.split(' ').map(className => reverseCssMapping[className]).join(' ');
+							const className = props.className
+								.split(' ')
+								.map(className => reverseCssMapping[className])
+								.join(' ')
+								.trim();
+							if (className) {
+								currentNode.class = className;
+							}
 						}
 					}
 					return createElement.apply(React, [tagOrComponent, props, children, ...rest]);
