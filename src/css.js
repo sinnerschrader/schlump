@@ -113,13 +113,17 @@ function getMatchingSelector(domStack, selector) {
 	let localStack = JSON.parse(JSON.stringify(domStack));
 	let siblings;
 	const updateCurrentSiblings = () => {
+		if (!localStack) {
+			siblings = undefined;
+			return;
+		}
 		if (localStack.length > 0 && Array.isArray(localStack[0])) {
 			[, siblings] = localStack;
 		} else {
 			siblings = localStack;
 		}
 	};
-	const getCurrentNode = () => siblings[siblings.length - 1];
+	const getCurrentNode = () => siblings ? siblings[siblings.length - 1] : '';
 	const toParent = () => {
 		localStack = localStack[localStack.length - 2];
 	};
@@ -146,6 +150,7 @@ function getMatchingSelector(domStack, selector) {
 				toParent();
 				updateCurrentSiblings();
 				return true;
+			case ' ':
 			case '>>':
 				parentMatchMode = 'any';
 				siblingMatchMode = 'current';
@@ -168,7 +173,7 @@ function getMatchingSelector(domStack, selector) {
 		if (parentMatchMode === 'current') {
 			return node.value === getCurrentNode();
 		} else if (parentMatchMode === 'any') {
-			while (node.value !== getCurrentNode()) {
+			while (localStack && node.value !== getCurrentNode()) { // eslint-disable-line no-unmodified-loop-condition
 				toParent();
 				updateCurrentSiblings();
 			}
@@ -196,6 +201,10 @@ function getMatchingSelector(domStack, selector) {
 	const transform = fullSelector => {
 		return selectors => {
 			selectors.each(selector => {
+				// reset state machine
+				siblingMatchMode = 'current';
+				parentMatchMode = 'current';
+
 				let matching = true;
 				for (let i = selector.nodes.length; matching && i > 0; i--) {
 					matching = isTypeMatching(selector.nodes[i - 1]);
