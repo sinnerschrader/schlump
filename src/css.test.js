@@ -256,3 +256,13 @@ test('getMatchingSelectors return matching child selectors', t => {
 
 	t.deepEqual(actual, expected);
 });
+
+test('getMatchingSelectors return matching selector list', t => {
+	const input = ['body > p, body > span', 'body > p, body > div'];
+	const expected = ['body > p, body > div'];
+	const domStack = [[['html'], ['head', 'body']], ['h1', 'div']];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
