@@ -9,6 +9,7 @@ const figures = require('figures');
 const {oneLine} = require('common-tags');
 const camelcase = require('camelcase');
 const uppercaseFirst = require('upper-case-first');
+var beautifyHtml = require('js-beautify').html;
 
 const {validatePages} = require('./validator');
 const {createReactComponent} = require('./templates');
@@ -81,7 +82,7 @@ function renderPage(content, filepath, {templates, vars, dest, cssVariables}) {
 	};
 
 	vm.runInNewContext('__html__ = React.createElement(DecoratedRootComponent);', sandbox, opts);
-	return [`<!DOCTYPE html>${ReactDOM.renderToStaticMarkup(sandbox.__html__)}`, destinationPath, cssParts.join('\n')];
+	return [beautifyHtml(`<!DOCTYPE html>${ReactDOM.renderToStaticMarkup(sandbox.__html__)}`), destinationPath, cssParts.join('\n')];
 }
 
 function createPageComponent({vars, filepath, parsed, templates, cssVariables}) {
