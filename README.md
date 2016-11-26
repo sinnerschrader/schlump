@@ -202,7 +202,6 @@ h1 + p {
 ## Template Imports
 
 With the option `--template-import` it is possible to integrate external [React](https://reactjs.com) 
-
 libraries (e.g. [elemental ui](http://elemental-ui.com/)) into schlump sites.
 
 The libraries are either referenced from node_modules (e.g. `elemental`) or by relative path
