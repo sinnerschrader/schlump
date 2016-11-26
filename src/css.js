@@ -160,8 +160,10 @@ function getVariables(cssom) {
 function resolveScopeVariables(cssom, scope) {
 	getDeclarations(cssom)
 		.forEach(declaration => {
-			scope.forEach((value, variableName) => {
-				declaration.value = declaration.value.replace(`var(${variableName})`, value);
-			});
+			while (declaration.value.includes('var(')) {
+				scope.forEach((value, variableName) => {
+					declaration.value = declaration.value.replace(`var(${variableName})`, value);
+				});
+			}
 		});
 }

@@ -206,3 +206,26 @@ test('createScopedCss should return a selector mapping for descendant CSS select
 	t.deepEqual(actual, expected);
 	t.deepEqual(mapping, expectedMapping);
 });
+
+test('createScopedCss should resolve variable values recursivly', t => {
+	const input = stripIndent`
+		<style scoped>
+			.selector {
+				declaration: var(--name);
+			}
+		</style>
+	`;
+	const vars = new Map([
+		['--other', 'value'],
+		['--name', 'var(--other)']
+	]);
+	const expected = stripIndent`
+	.name--1044404709-selector {
+	  declaration: value;
+	}
+	`;
+
+	const [,, actual] = createScopedCss(input, {ns: 'name', vars}, 'file', true);
+
+	t.deepEqual(actual, expected);
+});
