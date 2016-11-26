@@ -184,16 +184,16 @@ name: Element
     color: blue;
     background-color: var(--common-background-color);
 }
-.headline {
+.element h1 {
     color: green;
 }
-.copy {
+h1 + p {
     color: red;
 }
 </style>
 <div className={style.element}>
-    <h1 className={style.headline}>headline<h1>
-    <p className={style.copy}>
+    <h1>headline<h1>
+    <p>
         copytext
     </p>
 </div>
