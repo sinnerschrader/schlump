@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.15.1"></a>
+## [0.15.1](https://github.com/sinnerschrader/schlump/compare/v0.15.0...v0.15.1) (2016-11-26)
+
+
+### Bug Fixes
+
+* css output should be valid ([e144ee6](https://github.com/sinnerschrader/schlump/commit/e144ee6))
+
+
+
 <a name="0.15.0"></a>
 # [0.15.0](https://github.com/sinnerschrader/schlump/compare/v0.14.0...v0.15.0) (2016-11-26)
 
