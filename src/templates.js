@@ -11,7 +11,7 @@ const {Markdown, wrapMarkdown} = require('./markdown');
 const {getMarkup, createScopedCss} = require('./css');
 const {loadHelpers} = require('./helpers');
 const {transformJsx, evaluateHelpers} = require('./jsx');
-const {createElement} = require('./react-create-element');
+const {createElementFactory} = require('./react-create-element');
 
 module.exports = {
 	createTemplates,
@@ -109,7 +109,7 @@ function setupSandbox(templates, sandboxExtras, jsxHelpers, getLocalStyle) {
 				return new Proxy(React, {
 					get: function (target, name) {
 						if (name === 'createElement') {
-							return createElement(proxyTarget);
+							return createElementFactory(proxyTarget);
 						}
 						return target[name];
 					}

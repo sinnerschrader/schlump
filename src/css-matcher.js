@@ -107,7 +107,9 @@ class CssMatcher {
 	isTypeMatching(node) {
 		switch (node.type) {
 			case selectorParser.TAG:
-				return this.findMatchingSibling(node, node => node.value === this.currentNode.tag);
+				return this.findMatchingSibling(node, node => {
+					return node.value === this.currentNode.tag;
+				});
 			case selectorParser.COMBINATOR:
 				return this.isCombinatorMatching(node);
 			case selectorParser.CLASS:

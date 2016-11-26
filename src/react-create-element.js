@@ -3,10 +3,14 @@ const React = require('react');
 const {getMatchingSelectors} = require('./css');
 
 module.exports = {
-	createElement
+	createElementFactory
 };
 
-function createElement(sandbox) {
+/**
+ * @param {{cssMapping: any}} sandbox
+ * @returns {Function} Returns a function compatible with React.createElement
+ */
+function createElementFactory(sandbox) {
 	let reverseCssMapping;
 	const getReverseCssMapping = () => {
 		// sandbox.cssMapping is {[classname]: hashed-classname}
@@ -98,7 +102,7 @@ function createElement(sandbox) {
 			DomWrapper.childContextTypes = {
 				stack: React.PropTypes.any
 			};
-			return createElement.apply(React, [DomWrapper, undefined, []]);
+			return createElement.apply(React, [DomWrapper, props, []]);
 		}
 		return createElement.apply(React, [tagOrComponent, props, children, ...rest]);
 	};
