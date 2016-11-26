@@ -145,6 +145,7 @@ function getMatchingSelector(domStack, selector) {
 			case '~':
 				parentMatchMode = 'current';
 				siblingMatchMode = 'any';
+				siblings.pop();
 				return true;
 			case '>':
 				parentMatchMode = 'current';
@@ -164,22 +165,22 @@ function getMatchingSelector(domStack, selector) {
 		}
 	};
 
-	const isAnySiblingMatching = node => {
-		while (siblings.length > 0 && node.value !== getCurrentNode().tag) {
+	const isAnySiblingMatching = (node, isMatching) => {
+		while (siblings.length > 0 && !isMatching(node)) {
 			siblings.pop();
 		}
-		return node.value === getCurrentNode().tag;
+		return isMatching(node);
 	};
 
-	const isMatchingSelfOrParent = node => {
+	const isMatchingSelfOrParent = (node, isMatching) => {
 		if (parentMatchMode === 'current') {
-			return node.value === getCurrentNode().tag;
+			return isMatching(node);
 		} else if (parentMatchMode === 'any') {
-			while (localStack && node.value !== getCurrentNode().tag) { // eslint-disable-line no-unmodified-loop-condition
+			while (localStack && !isMatching(node)) { // eslint-disable-line no-unmodified-loop-condition
 				toParent();
 				updateCurrentSiblings();
 			}
-			return node.value === getCurrentNode().tag;
+			return isMatching(node);
 		}
 		return false;
 	};
@@ -188,15 +189,23 @@ function getMatchingSelector(domStack, selector) {
 		switch (node.type) {
 			case selectorParser.TAG:
 				if (siblingMatchMode === 'current') {
-					return isMatchingSelfOrParent(node);
+					return isMatchingSelfOrParent(node,
+						node => node.value === getCurrentNode().tag);
 				} else if (siblingMatchMode === 'any') {
-					return isAnySiblingMatching(node);
+					return isAnySiblingMatching(node,
+						node => node.value === getCurrentNode().tag);
 				}
 				return false;
 			case selectorParser.COMBINATOR:
 				return isCombinatorMatching(node);
 			case selectorParser.CLASS:
-				return (getCurrentNode().class || '').split(' ').includes(node.value);
+				if (siblingMatchMode === 'current') {
+					return isMatchingSelfOrParent(node,
+						node => (getCurrentNode().class || '').split(' ').includes(node.value));
+				} else if (siblingMatchMode === 'any') {
+					throw new Error('...');
+				}
+				return false;
 			default:
 				return false;
 		}
