@@ -3,6 +3,8 @@ const css = require('css');
 const decamelize = require('decamelize');
 const selectorParser = require('postcss-selector-parser');
 
+const {getMatchingSelectors} = require('./css-matcher');
+
 module.exports = {
 	createScopedCss,
 	combineCss,
@@ -102,136 +104,6 @@ function getClassNames(ns, cssom) {
 			selectorParser(transform).process(selector);
 			return classNames;
 		}, {});
-}
-
-function getMatchingSelectors(domStack, selectors) {
-	return selectors.reduce((matchingSelectors, selector) =>
-		[...matchingSelectors, ...getMatchingSelector(domStack, selector)], []);
-}
-
-function getMatchingSelector(domStack, selector) {
-	let localStack = JSON.parse(JSON.stringify(domStack));
-	let siblings;
-	const updateCurrentSiblings = () => {
-		// no localStack => no siblings
-		if (!localStack) {
-			siblings = undefined;
-			return;
-		}
-		// stack structure: [[parents], [siblings]]
-		if (localStack.length > 0 && Array.isArray(localStack[0])) {
-			[, siblings] = localStack;
-		} else {
-			siblings = localStack;
-		}
-	};
-	const getCurrentNode = () => siblings ? siblings[siblings.length - 1] || {} : {};
-	const toParent = () => {
-		localStack = localStack[localStack.length - 2];
-	};
-
-	// could be 'current' or 'any'
-	let siblingMatchMode = 'current';
-	let parentMatchMode = 'current';
-	const matchingSelectors = [];
-
-	const isCombinatorMatching = node => {
-		switch (node.value) {
-			case '+':
-				parentMatchMode = 'current';
-				siblingMatchMode = 'current';
-				siblings.pop();
-				return true;
-			case '~':
-				parentMatchMode = 'current';
-				siblingMatchMode = 'any';
-				siblings.pop();
-				return true;
-			case '>':
-				parentMatchMode = 'current';
-				siblingMatchMode = 'current';
-				toParent();
-				updateCurrentSiblings();
-				return true;
-			case ' ':
-			case '>>':
-				parentMatchMode = 'any';
-				siblingMatchMode = 'current';
-				toParent();
-				updateCurrentSiblings();
-				return true;
-			default:
-				return false;
-		}
-	};
-
-	const isAnySiblingMatching = (node, isMatching) => {
-		while (siblings.length > 0 && !isMatching(node)) {
-			siblings.pop();
-		}
-		return isMatching(node);
-	};
-
-	const isMatchingSelfOrParent = (node, isMatching) => {
-		if (parentMatchMode === 'current') {
-			return isMatching(node);
-		} else if (parentMatchMode === 'any') {
-			while (localStack && !isMatching(node)) { // eslint-disable-line no-unmodified-loop-condition
-				toParent();
-				updateCurrentSiblings();
-			}
-			return isMatching(node);
-		}
-		return false;
-	};
-
-	const isTypeMatching = node => {
-		switch (node.type) {
-			case selectorParser.TAG:
-				if (siblingMatchMode === 'current') {
-					return isMatchingSelfOrParent(node,
-						node => node.value === getCurrentNode().tag);
-				} else if (siblingMatchMode === 'any') {
-					return isAnySiblingMatching(node,
-						node => node.value === getCurrentNode().tag);
-				}
-				return false;
-			case selectorParser.COMBINATOR:
-				return isCombinatorMatching(node);
-			case selectorParser.CLASS:
-				if (siblingMatchMode === 'current') {
-					return isMatchingSelfOrParent(node,
-						node => (getCurrentNode().class || '').split(' ').includes(node.value));
-				} else if (siblingMatchMode === 'any') {
-					throw new Error('...');
-				}
-				return false;
-			default:
-				return false;
-		}
-	};
-
-	const transform = fullSelector => {
-		return selectors => {
-			selectors.each(selector => {
-				// reset state machine
-				siblingMatchMode = 'current';
-				parentMatchMode = 'current';
-
-				let matching = true;
-				for (let i = selector.nodes.length; matching && i > 0; i--) {
-					matching = isTypeMatching(selector.nodes[i - 1]);
-				}
-				if (matching) {
-					matchingSelectors.push(fullSelector);
-				}
-			});
-		};
-	};
-
-	updateCurrentSiblings();
-	selectorParser(transform(selector)).process(selector);
-	return matchingSelectors;
 }
 
 function selectorTransform(ns) {
