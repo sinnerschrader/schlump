@@ -25,7 +25,10 @@ function build(opts) {
 				opts.srcStatics : [opts.srcStatics];
 			const srcsStatics = srcs.map(src => path.resolve(cwd, src));
 
-			const jobs = srcsStatics.map(throat(1, src => sander.copydir(src).to(destStatics)));
+			const jobs = srcsStatics.map(throat(1, src => {
+				return sander.exists(src).then(exists => exists ? sander.copydir(src).to(destStatics) : null);
+			}));
+
 			return Promise.all(jobs);
 		})
 		.then(() => createTemplates(opts.srcTemplates, opts.srcHelpers, {cssVariables: opts.cssVariables}))
