@@ -123,6 +123,8 @@ class CssMatcher {
 				return this.currentNode.attrs[node.attribute].startsWith(node.value);
 			case '$=':
 				return this.currentNode.attrs[node.attribute].endsWith(node.value);
+			case '*=':
+				return this.currentNode.attrs[node.attribute].includes(node.value);
 			default:
 				return false;
 		}
