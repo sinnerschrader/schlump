@@ -104,6 +104,30 @@ class CssMatcher {
 		return false;
 	}
 
+	isAttributeMatching(node) {
+		if (!this.currentNode.attrs || !(node.attribute in this.currentNode.attrs)) {
+			return false;
+		}
+		if (node.operator === undefined && node.value === undefined) {
+			return true;
+		}
+		switch (node.operator) {
+			case '=':
+				return this.currentNode.attrs[node.attribute] === node.value;
+			case '~=':
+				return this.currentNode.attrs[node.attribute].split(' ').includes(node.value);
+			case '|=':
+				return this.currentNode.attrs[node.attribute] === node.value ||
+					this.currentNode.attrs[node.attribute].startsWith(`${node.value}-`);
+			case '^=':
+				return this.currentNode.attrs[node.attribute].startsWith(node.value);
+			case '$=':
+				return this.currentNode.attrs[node.attribute].endsWith(node.value);
+			default:
+				return false;
+		}
+	}
+
 	isTypeMatching(node) {
 		switch (node.type) {
 			case selectorParser.TAG:
@@ -115,25 +139,7 @@ class CssMatcher {
 			case selectorParser.CLASS:
 				return this.findMatchingSibling(node, node => (this.currentNode.class || '').split(' ').includes(node.value));
 			case selectorParser.ATTRIBUTE:
-				return this.findMatchingSibling(node, node => {
-					if (this.currentNode.attrs && node.attribute in this.currentNode.attrs) {
-						if (node.operator === '=') {
-							return this.currentNode.attrs[node.attribute] === node.value;
-						} else if (node.operator === '~=') {
-							return this.currentNode.attrs[node.attribute].split(' ').includes(node.value);
-						} else if (node.operator === '|=') {
-							return this.currentNode.attrs[node.attribute] === node.value ||
-								this.currentNode.attrs[node.attribute].startsWith(`${node.value}-`);
-						} else if (node.operator === '^=') {
-							return this.currentNode.attrs[node.attribute].startsWith(node.value);
-						} else if (node.operator === '$=') {
-							return this.currentNode.attrs[node.attribute].endsWith(node.value);
-						} else if (node.operator === undefined && node.value === undefined) {
-							return true;
-						}
-					}
-					return false;
-				});
+				return this.findMatchingSibling(node, node => this.isAttributeMatching(node));
 			default:
 				return false;
 		}
