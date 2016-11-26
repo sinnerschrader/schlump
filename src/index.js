@@ -48,7 +48,7 @@ function build(opts) {
 					.then(pageStylesheets => {
 						if (scopedCss) {
 							const rules = pageStylesheets.join('\n').split('}').map(rule => rule.trim() + '}');
-							const uniqueRules = Array.from(new Set(rules)).join('\n');
+							const uniqueRules = Array.from(new Set(rules.slice(0, rules.length - 1))).join('\n');
 							return sander.writeFile(scopedCss, uniqueRules);
 						}
 					}))
