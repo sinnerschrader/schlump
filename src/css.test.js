@@ -229,3 +229,26 @@ test('createScopedCss should resolve variable values recursivly', t => {
 
 	t.deepEqual(actual, expected);
 });
+
+test('createScopedCss should handle pseudo-classes correct', t => {
+	const input = stripIndent`
+		<style scoped>
+			.selector:pseudo {
+				declaration: value;
+			}
+		</style>
+	`;
+	const expectedClasses = {
+		selector: 'name-1092746841-selector'
+	};
+	const expectedStyle = stripIndent`
+	.name-1092746841-selector:pseudo {
+	  declaration: value;
+	}
+	`;
+
+	const [actualClasses,, actualStyle] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);
+
+	t.deepEqual(actualClasses, expectedClasses);
+	t.deepEqual(actualStyle, expectedStyle);
+});

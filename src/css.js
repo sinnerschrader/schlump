@@ -96,8 +96,11 @@ function getClassNames(ns, cssom) {
 		.reduce((classNames, selector) => {
 			const transform = selectors => {
 				selectors.each(selector => {
-					if (selector.nodes.length === 1 && selector.nodes[0].type === selectorParser.CLASS) {
+					if ((selector.nodes.length === 1 && selector.nodes[0].type === selectorParser.CLASS)) {
 						classNames[camelcase(String(selector))] = `${ns}-${selector.nodes[0].value}`;
+					} else if (selector.nodes.length === 2 && selector.nodes[0].type === selectorParser.CLASS &&
+							selector.nodes[1].type === selectorParser.PSEUDO) {
+						classNames[camelcase(String(selector.nodes[0].value))] = `${ns}-${selector.nodes[0].value}`;
 					}
 				});
 			};
