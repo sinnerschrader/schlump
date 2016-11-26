@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.15.0"></a>
+# [0.15.0](https://github.com/sinnerschrader/schlump/compare/v0.14.0...v0.15.0) (2016-11-26)
+
+
+### Bug Fixes
+
+* class matching with siblings and parents ([42133d6](https://github.com/sinnerschrader/schlump/commit/42133d6))
+* do not add empty class attributes ([9e43e21](https://github.com/sinnerschrader/schlump/commit/9e43e21))
+* handling of pseudo classes ([bbae5c6](https://github.com/sinnerschrader/schlump/commit/bbae5c6))
+* matched selectors must add to the props of an element ([8acac7a](https://github.com/sinnerschrader/schlump/commit/8acac7a))
+* resolve variables recursivly ([5ae3d57](https://github.com/sinnerschrader/schlump/commit/5ae3d57))
+* update related to review ([12c8ab6](https://github.com/sinnerschrader/schlump/commit/12c8ab6))
+
+### Features
+
+* add child selector ([c447f61](https://github.com/sinnerschrader/schlump/commit/c447f61))
+* add descendant selector (>>) ([ebc38c1](https://github.com/sinnerschrader/schlump/commit/ebc38c1))
+* add descendent selector ([9055325](https://github.com/sinnerschrader/schlump/commit/9055325))
+* add general sibling selector ([e9190bf](https://github.com/sinnerschrader/schlump/commit/e9190bf))
+* apply scoped css ([8468f1e](https://github.com/sinnerschrader/schlump/commit/8468f1e))
+* beautify html output ([5c7c396](https://github.com/sinnerschrader/schlump/commit/5c7c396))
+* implement reverse classname mapping ([a166472](https://github.com/sinnerschrader/schlump/commit/a166472))
+
+
+
 <a name="0.14.0"></a>
 # [0.14.0](https://github.com/sinnerschrader/schlump/compare/v0.13.2...v0.14.0) (2016-11-22)
 
