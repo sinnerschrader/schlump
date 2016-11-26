@@ -100,3 +100,83 @@ test('getMatchingSelectors return matching complex selector', t => {
 
 	t.deepEqual(actual, expected);
 });
+
+test('getMatchingSelectors return matching attribute [name] selectors', t => {
+	const input = ['body [attr]', 'body [no-attr]'];
+	const expected = ['body [attr]'];
+	const domStack = [[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div', attrs: {attr: 'value'}}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
+
+test('getMatchingSelectors return matching attribute [name=value] selectors', t => {
+	const input = ['body [attr=value]', 'body [no-attr]'];
+	const expected = ['body [attr=value]'];
+	const domStack = [[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div', attrs: {attr: 'value'}}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
+
+test('getMatchingSelectors return matching attribute [name~=value] selectors', t => {
+	const input = ['body [attr~=value]', 'body [no-attr]'];
+	const expected = ['body [attr~=value]'];
+	const domStack = [[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div', attrs: {attr: 'previous value next'}}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
+
+test('getMatchingSelectors return matching attribute [name|=value] selectors', t => {
+	const input = ['body [attr|=value]', 'body [no-attr]'];
+	const expected = ['body [attr|=value]'];
+	const domStack = [[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div', attrs: {attr: 'value-postfix'}}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
+
+test('getMatchingSelectors return matching attribute [name^=value] selectors', t => {
+	const input = ['body [attr^=value]', 'body [no-attr]'];
+	const expected = ['body [attr^=value]'];
+	const domStack = [[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div', attrs: {attr: 'valuevaluevalue'}}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
+
+test('getMatchingSelectors return matching attribute [name$=value] selectors', t => {
+	const input = ['body [attr$=value]', 'body [no-attr]'];
+	const expected = ['body [attr$=value]'];
+	const domStack = [[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div', attrs: {attr: 'valuevaluevalue'}}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
+
+test('getMatchingSelectors return matching attribute [name*=value] selectors', t => {
+	const input = ['body [attr*=value]', 'body [no-attr]'];
+	const expected = ['body [attr*=value]'];
+	const domStack = [[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div', attrs: {attr: 'prefixvaluepostfix'}}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
+
+test('getMatchingSelectors return matching attribute [name*=value i] selectors', t => {
+	const input = ['body [attr*=value i]', 'body [attr*=vAlUe i]', 'body [no-attr i]'];
+	const expected = ['body [attr*=value i]', 'body [attr*=vAlUe i]'];
+	const domStack = [[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div', attrs: {attr: 'prefixVaLuEpostfix'}}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});

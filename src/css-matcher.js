@@ -104,6 +104,38 @@ class CssMatcher {
 		return false;
 	}
 
+	isAttributeMatching(node) {
+		if (!this.currentNode.attrs || !(node.attribute in this.currentNode.attrs)) {
+			return false;
+		}
+		if (node.operator === undefined && node.value === undefined) {
+			return true;
+		}
+		let left = this.currentNode.attrs[node.attribute];
+		let right = node.value;
+		if (node.insensitive) {
+			left = left.toLowerCase();
+			right = right.toLowerCase();
+		}
+		switch (node.operator) {
+			case '=':
+				return left === right;
+			case '~=':
+				return left.split(' ').includes(right);
+			case '|=':
+				return left === right ||
+					left.startsWith(`${right}-`);
+			case '^=':
+				return left.startsWith(right);
+			case '$=':
+				return left.endsWith(right);
+			case '*=':
+				return left.includes(right);
+			default:
+				return false;
+		}
+	}
+
 	isTypeMatching(node) {
 		switch (node.type) {
 			case selectorParser.TAG:
@@ -114,6 +146,8 @@ class CssMatcher {
 				return this.isCombinatorMatching(node);
 			case selectorParser.CLASS:
 				return this.findMatchingSibling(node, node => (this.currentNode.class || '').split(' ').includes(node.value));
+			case selectorParser.ATTRIBUTE:
+				return this.findMatchingSibling(node, node => this.isAttributeMatching(node));
 			default:
 				return false;
 		}
