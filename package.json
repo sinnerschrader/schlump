@@ -58,6 +58,7 @@
     "htmlparser": "^1.7.7",
     "js-beautify": "^1.6.4",
     "meow": "^3.7.0",
+    "postcss-selector-parser": "^2.2.2",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "require-all": "^2.0.0",

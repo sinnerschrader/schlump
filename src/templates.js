@@ -6,11 +6,12 @@ const camelcase = require('camelcase');
 const uppercaseFirst = require('upper-case-first');
 const React = require('react');
 const matter = require('gray-matter');
-const {Markdown, wrapMarkdown} = require('./markdown');
 
+const {Markdown, wrapMarkdown} = require('./markdown');
 const {getMarkup, createScopedCss} = require('./css');
 const {loadHelpers} = require('./helpers');
 const {transformJsx, evaluateHelpers} = require('./jsx');
+const {createElementFactory} = require('./react-create-element');
 
 module.exports = {
 	createTemplates,
@@ -54,6 +55,7 @@ function createReactComponent(filepath, templates, sandboxExtras, {name, code, c
 	const html = getMarkup(code);
 	const {helpers: jsxHelpers, statement} = transformJsx(html);
 	const sandbox = setupSandbox(templates, sandboxExtras, jsxHelpers, createLocalStyleFactory(code, name, filepath, cssVariables));
+
 	const opts = {
 		filename: filepath,
 		displayErrors: true
@@ -61,7 +63,8 @@ function createReactComponent(filepath, templates, sandboxExtras, {name, code, c
 	const componentCode = `
 		const SFC = (reactProps, context) => {
 			const props = Object.assign({}, sandboxProps, reactProps);
-			const style = getLocalStyle(context);
+			const [style, mapping] = getLocalStyle(context);
+			cssMapping = mapping;
 			return (${statement});
 		};
 		SFC.contextTypes = {scope: React.PropTypes.any};
@@ -79,6 +82,19 @@ function setupSandbox(templates, sandboxExtras, jsxHelpers, getLocalStyle) {
 	if (sandboxExtras.props) {
 		sandboxExtras.sandboxProps = sandboxExtras.props;
 	}
+	const proxyTarget = Object.assign(
+		{
+			React,
+			name: undefined,
+			contextStackFactory,
+			getLocalStyle,
+			Object,
+			console,
+			cssMapping: undefined
+		},
+		sandboxExtras,
+		evaluateHelpers(jsxHelpers)
+	);
 	const proxyHandler = {
 		/*
 		 * Trap property resolution
@@ -88,31 +104,30 @@ function setupSandbox(templates, sandboxExtras, jsxHelpers, getLocalStyle) {
 			if (templates[name]) {
 				return templates[name];
 			}
+			// monkey-patch React.createElement
+			if (name === 'React') {
+				return new Proxy(React, {
+					get: function (target, name) {
+						if (name === 'createElement') {
+							return createElementFactory(proxyTarget);
+						}
+						return target[name];
+					}
+				});
+			}
 			return target[name];
 		}
 	};
-	const proxyTarget = Object.assign(
-		{
-			React,
-			name: undefined,
-			contextStackFactory,
-			getLocalStyle,
-			Object,
-			console
-		},
-		sandboxExtras,
-		evaluateHelpers(jsxHelpers)
-	);
 
 	return new Proxy(proxyTarget, proxyHandler);
 }
 
 function createLocalStyleFactory(htmlSource, ns, filepath, cssVariables) {
 	return context => {
-		const [classNames, vars, css] = createScopedCss(htmlSource, {ns, vars: context.scope.get()}, filepath, cssVariables);
+		const [classNames, vars, css, mapping] = createScopedCss(htmlSource, {ns, vars: context.scope.get()}, filepath, cssVariables);
 		context.scope.set(vars);
 		context.scope.css(css);
-		return classNames;
+		return [classNames, mapping];
 	};
 }
 
@@ -120,6 +135,11 @@ function contextStackFactory(SFC) {
 	class ContextStack extends React.Component {
 		getChildContext() {
 			return {
+				/*
+				 * css-vars scope
+				 *
+				 * Used to track the variable scope over pages/templates
+				 */
 				scope: {
 					get: () => {
 						if (this.localScope) {
@@ -133,6 +153,20 @@ function contextStackFactory(SFC) {
 					css: css => {
 						this.context.scope.css(css);
 					}
+				},
+				/*
+				 * dom-stack
+				 *
+				 * Used to track the DOM per page/template to apply css selectors
+				 */
+				stack: {
+					push(node) {
+						this.domeStack = this.domeStack || [];
+						this.domeStack.push(node);
+					},
+					peek() {
+						return this.domeStack || [];
+					}
 				}
 			};
 		}
@@ -145,7 +179,8 @@ function contextStackFactory(SFC) {
 		scope: React.PropTypes.any
 	};
 	ContextStack.childContextTypes = {
-		scope: React.PropTypes.any
+		scope: React.PropTypes.any,
+		stack: React.PropTypes.any
 	};
 	return ContextStack;
 }

@@ -17,10 +17,14 @@
   /* IE6-9 */}
 /* comment */
 
-.with-style-806350838-styled-container {
+.with-style-271543454-styled-container {
   --main-red: blue;
   border: 1px solid darkgreen;
   background-color: rgb(255, 220, 1);}
+.with-style-271543454-styled-container .with-style-271543454-h2 {
+  font-weight: bold;}
+h2 + .with-style-271543454-p {
+  margin: 50px;}
 .my-component--727887898-colored {
   color: blue;}
 }

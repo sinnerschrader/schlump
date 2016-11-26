@@ -127,3 +127,82 @@ test('createScopedCss should handle comments gracefully', t => {
 
 	t.notThrows(() => createScopedCss(inputHtml, {ns: 'ns', vars: new Map()}, 'file'));
 });
+
+test('createScopedCss should replace simple CSS selectors with a prefixed-hashed one', t => {
+	const input = stripIndent`
+		<style scoped>
+			.selector {
+				declaration: value;
+			}
+		</style>
+	`;
+	const expected = stripIndent`
+	.name--1044404709-selector {
+	  declaration: value;
+	}
+	`;
+
+	const [,, actual] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);
+
+	t.deepEqual(actual, expected);
+});
+
+test('createScopedCss should return a selector mapping for simple CSS selectors', t => {
+	const input = stripIndent`
+		<style scoped>
+			.selector {
+				declaration: value;
+			}
+		</style>
+	`;
+	const expected = {
+		selector: 'name--1044404709-selector'
+	};
+	const expectedMapping = {
+		'.selector': 'name--1044404709-selector'
+	};
+
+	const [actual,,, mapping] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);
+
+	t.deepEqual(actual, expected);
+	t.deepEqual(mapping, expectedMapping);
+});
+
+test('createScopedCss should replace descendant CSS selectors with a prefixed-hashed one', t => {
+	const input = stripIndent`
+		<style scoped>
+			.selector descendant {
+				declaration: value;
+			}
+		</style>
+	`;
+	const expected = stripIndent`
+	.name--571293890-selector .name--571293890-descendant {
+	  declaration: value;
+	}
+	`;
+
+	const [,, actual] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);
+
+	t.deepEqual(actual, expected);
+});
+
+test('createScopedCss should return a selector mapping for descendant CSS selectors', t => {
+	const input = stripIndent`
+		<style scoped>
+			.selector descendant {
+				declaration: value;
+			}
+		</style>
+	`;
+	const expected = {
+	};
+	const expectedMapping = {
+		'.selector descendant': 'name--571293890-descendant'
+	};
+
+	const [actual,,, mapping] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);
+
+	t.deepEqual(actual, expected);
+	t.deepEqual(mapping, expectedMapping);
+});
