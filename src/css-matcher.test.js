@@ -170,3 +170,13 @@ test('getMatchingSelectors return matching attribute [name*=value] selectors', t
 
 	t.deepEqual(actual, expected);
 });
+
+test('getMatchingSelectors return matching attribute [name*=value i] selectors', t => {
+	const input = ['body [attr*=value i]', 'body [attr*=vAlUe i]', 'body [no-attr i]'];
+	const expected = ['body [attr*=value i]', 'body [attr*=vAlUe i]'];
+	const domStack = [[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div', attrs: {attr: 'prefixVaLuEpostfix'}}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});

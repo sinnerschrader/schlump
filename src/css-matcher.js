@@ -111,20 +111,26 @@ class CssMatcher {
 		if (node.operator === undefined && node.value === undefined) {
 			return true;
 		}
+		let left = this.currentNode.attrs[node.attribute];
+		let right = node.value;
+		if (node.insensitive) {
+			left = left.toLowerCase();
+			right = right.toLowerCase();
+		}
 		switch (node.operator) {
 			case '=':
-				return this.currentNode.attrs[node.attribute] === node.value;
+				return left === right;
 			case '~=':
-				return this.currentNode.attrs[node.attribute].split(' ').includes(node.value);
+				return left.split(' ').includes(right);
 			case '|=':
-				return this.currentNode.attrs[node.attribute] === node.value ||
-					this.currentNode.attrs[node.attribute].startsWith(`${node.value}-`);
+				return left === right ||
+					left.startsWith(`${right}-`);
 			case '^=':
-				return this.currentNode.attrs[node.attribute].startsWith(node.value);
+				return left.startsWith(right);
 			case '$=':
-				return this.currentNode.attrs[node.attribute].endsWith(node.value);
+				return left.endsWith(right);
 			case '*=':
-				return this.currentNode.attrs[node.attribute].includes(node.value);
+				return left.includes(right);
 			default:
 				return false;
 		}
