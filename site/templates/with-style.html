@@ -16,8 +16,12 @@ name: WithStyle
 h2 + p {
 	margin: 50px;
 }
+
+[data-theme] {
+	border: 1px solid deeppink;
+}
 </style>
-<div className={style.styledContainer}>
+<div className={style.styledContainer} data-theme="abc">
 	<h2>headline<p>test</p></h2>
 	<p>paragraph</p>
 	<MyComponent/>

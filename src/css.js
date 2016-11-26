@@ -120,13 +120,18 @@ function selectorTransform(ns) {
 					if (selector.nodes[i].type === selectorParser.CLASS) {
 						selector.nodes[i].replaceWith(selectorParser.className({value:
 							`${ns}-${selector.nodes[i].value}`}));
+						map[sourceSelector] = String(selector.last).replace(/^\./, '');
+					} else if (selector.nodes[i].type === selectorParser.ATTRIBUTE) {
+						const classSelector = selectorParser.className({value: ns});
+						selector.insertBefore(selector.nodes[i], classSelector);
+						map[sourceSelector] = String(classSelector).replace(/^\./, '');
 					}
 				}
 				if (selector.last.type === selectorParser.TAG) {
 					selector.last.replaceWith(selectorParser.className({value:
 						`${ns}-${selector.last.value}`}));
+					map[sourceSelector] = String(selector.last).replace(/^\./, '');
 				}
-				map[sourceSelector] = String(selector.last).replace(/^\./, '');
 			});
 		}
 	};

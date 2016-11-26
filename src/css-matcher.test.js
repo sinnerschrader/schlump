@@ -100,3 +100,23 @@ test('getMatchingSelectors return matching complex selector', t => {
 
 	t.deepEqual(actual, expected);
 });
+
+test('getMatchingSelectors return matching attribute [name] selectors', t => {
+	const input = ['body [attr]', 'body [no-attr]'];
+	const expected = ['body [attr]'];
+	const domStack = [[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div', attrs: {attr: 'value'}}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
+
+test('getMatchingSelectors return matching attribute [name=value] selectors', t => {
+	const input = ['body [attr=value]', 'body [no-attr]'];
+	const expected = ['body [attr=value]'];
+	const domStack = [[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div', attrs: {attr: 'value'}}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});

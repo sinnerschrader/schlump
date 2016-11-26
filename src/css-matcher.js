@@ -114,6 +114,17 @@ class CssMatcher {
 				return this.isCombinatorMatching(node);
 			case selectorParser.CLASS:
 				return this.findMatchingSibling(node, node => (this.currentNode.class || '').split(' ').includes(node.value));
+			case selectorParser.ATTRIBUTE:
+				return this.findMatchingSibling(node, node => {
+					if (this.currentNode.attrs && node.attribute in this.currentNode.attrs) {
+						if (node.operator === '=') {
+							return this.currentNode.attrs[node.attribute] === node.value;
+						} else if (node.operator === undefined && node.value === undefined) {
+							return true;
+						}
+					}
+					return false;
+				});
 			default:
 				return false;
 		}

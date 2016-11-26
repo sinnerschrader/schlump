@@ -82,15 +82,19 @@ function createElementFactory(sandbox) {
 					if (!props.className) {
 						props.className = '';
 					}
-					props.className += matchingSelectors
-						.map(matchingSelector => sandbox.cssMapping[matchingSelector])
-						.join(' ');
+					props.className =
+						[
+							...props.className.split(' '),
+							...matchingSelectors.map(matchingSelector => sandbox.cssMapping[matchingSelector])
+						]
+						.join(' ')
+						.trim();
 					return props;
 				}
 
 				render() {
 					// note: this calls have side effects - call order matters
-					const currentNode = {tag: tagOrComponent};
+					const currentNode = {tag: tagOrComponent, attrs: props};
 					this.context.stack.push(currentNode);
 					props = this.processCssMappings(props, currentNode);
 					return createElement.apply(React, [tagOrComponent, props, children, ...rest]);
