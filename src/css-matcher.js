@@ -121,6 +121,9 @@ class CssMatcher {
 							return this.currentNode.attrs[node.attribute] === node.value;
 						} else if (node.operator === '~=') {
 							return this.currentNode.attrs[node.attribute].split(' ').includes(node.value);
+						} else if (node.operator === '|=') {
+							return this.currentNode.attrs[node.attribute] === node.value ||
+								this.currentNode.attrs[node.attribute].startsWith(`${node.value}-`);
 						} else if (node.operator === undefined && node.value === undefined) {
 							return true;
 						}
