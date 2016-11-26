@@ -119,6 +119,8 @@ class CssMatcher {
 					if (this.currentNode.attrs && node.attribute in this.currentNode.attrs) {
 						if (node.operator === '=') {
 							return this.currentNode.attrs[node.attribute] === node.value;
+						} else if (node.operator === '~=') {
+							return this.currentNode.attrs[node.attribute].split(' ').includes(node.value);
 						} else if (node.operator === undefined && node.value === undefined) {
 							return true;
 						}
