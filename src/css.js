@@ -121,7 +121,8 @@ function selectorTransform(ns) {
 						selector.nodes[i].replaceWith(selectorParser.className({value:
 							`${ns}-${selector.nodes[i].value}`}));
 						map[sourceSelector] = String(selector.last).replace(/^\./, '');
-					} else if (selector.nodes[i].type === selectorParser.ATTRIBUTE) {
+					} else if (selector.nodes[i].type === selectorParser.ATTRIBUTE &&
+							(i === 0 || selector.nodes[i - 1].type !== selectorParser.CLASS)) {
 						const classSelector = selectorParser.className({value: ns});
 						selector.insertBefore(selector.nodes[i], classSelector);
 						map[sourceSelector] = String(classSelector).replace(/^\./, '');
