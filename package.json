@@ -63,7 +63,7 @@
     "react-dom": "^15.3.2",
     "require-all": "^2.0.0",
     "resolve-from": "^2.0.0",
-    "sander": "^0.5.1",
+    "sander": "^0.6.0",
     "semver": "^5.3.0",
     "soupselect": "^0.2.0",
     "throat": "^3.0.0",
