@@ -256,6 +256,9 @@ test('createScopedCss should handle pseudo-classes correct', t => {
 test('createScopedCss should prefix attribute selectors with classname', t => {
 	const input = stripIndent`
 		<style scoped>
+			[data-attr] {
+				declaration: value;
+			}
 			selector [data-attr] {
 				declaration: value;
 			}
@@ -264,13 +267,22 @@ test('createScopedCss should prefix attribute selectors with classname', t => {
 	const expectedClasses = {
 	};
 	const expectedStyle = stripIndent`
-	selector .name-1156369681[data-attr] {
+	.name--192375069[data-attr] {
+	  declaration: value;
+	}
+
+	selector .name--192375069[data-attr] {
 	  declaration: value;
 	}
 	`;
+	const expectedMapping = {
+		'[data-attr]': 'name--192375069',
+		'selector [data-attr]': 'name--192375069'
+	};
 
-	const [actualClasses,, actualStyle] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);
+	const [actualClasses,, actualStyle, actualMapping] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);
 
 	t.deepEqual(actualClasses, expectedClasses);
 	t.deepEqual(actualStyle, expectedStyle);
+	t.deepEqual(actualMapping, expectedMapping);
 });

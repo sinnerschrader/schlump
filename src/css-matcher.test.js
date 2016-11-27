@@ -180,3 +180,13 @@ test('getMatchingSelectors return matching attribute [name*=value i] selectors',
 
 	t.deepEqual(actual, expected);
 });
+
+test('getMatchingSelectors return matching attribute with pseudo selectors', t => {
+	const input = ['[attr=value]:hover'];
+	const expected = ['[attr=value]:hover'];
+	const domStack = [[[{tag: 'html'}], [{tag: 'head'}, {tag: 'body'}]], [{tag: 'div', attrs: {attr: 'value'}}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});

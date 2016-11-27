@@ -148,6 +148,8 @@ class CssMatcher {
 				return this.findMatchingSibling(node, node => (this.currentNode.class || '').split(' ').includes(node.value));
 			case selectorParser.ATTRIBUTE:
 				return this.findMatchingSibling(node, node => this.isAttributeMatching(node));
+			case selectorParser.PSEUDO:
+				return true;
 			default:
 				return false;
 		}
