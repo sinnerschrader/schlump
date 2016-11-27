@@ -11,6 +11,7 @@
     "start": "npm run watch:site",
     "test": "nyc --all --reporter lcov ./node_modules/.bin/ava",
     "commitmsg": "conventional-changelog-lint -e",
+    "prerelease": "git checkout master && git pull origin master && npm run linter && npm test && npm run site",
     "release": "standard-version --no-verify",
     "postrelease": "git push --follow-tags origin master && npm publish",
     "presite": "rimraf ./docs/* && lessc --clean-css ./node_modules/elemental/less/elemental.less docs/statics/elemental.styles.css",
