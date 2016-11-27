@@ -1,6 +1,6 @@
 {
   "name": "schlump",
-  "version": "0.15.1",
+  "version": "0.16.0",
   "description": "A static site generator utilizing reactjs",
   "bin": {
     "schlump": "./src/cli.js"

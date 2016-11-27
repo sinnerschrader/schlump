@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.16.0"></a>
+# [0.16.0](https://github.com/sinnerschrader/schlump/compare/v0.15.1...v0.16.0) (2016-11-27)
+
+
+### Bug Fixes
+
+* attribute rewrite only with plain attributes ([341cd98](https://github.com/sinnerschrader/schlump/commit/341cd98))
+* handle pseudo selectors ([497d40b](https://github.com/sinnerschrader/schlump/commit/497d40b))
+
+### Features
+
+* add [attr] and [attr=value] selectors ([249716e](https://github.com/sinnerschrader/schlump/commit/249716e))
+* add [attr*=value] selector ([5478692](https://github.com/sinnerschrader/schlump/commit/5478692))
+* add [attr\|=value] selector ([7887704](https://github.com/sinnerschrader/schlump/commit/7887704))
+* add [attr^=value] and [attr$=value] selectors ([da51b2b](https://github.com/sinnerschrader/schlump/commit/da51b2b))
+* add [attr~=value] selector ([1344789](https://github.com/sinnerschrader/schlump/commit/1344789))
+* add attribute to lowercase case ([438d3ae](https://github.com/sinnerschrader/schlump/commit/438d3ae))
+
+
+
 <a name="0.15.1"></a>
 ## [0.15.1](https://github.com/sinnerschrader/schlump/compare/v0.15.0...v0.15.1) (2016-11-26)
 
