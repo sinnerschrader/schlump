@@ -11,7 +11,7 @@ if (!semver.satisfies(process.version, '>=6')) {
 
 const cli = meow(`
 	Usage
-		$ schlump
+		$ schlump [options]
 
 	Options
 
@@ -19,7 +19,7 @@ const cli = meow(`
 		--src                  Source folder (defaults to src)
 		--src-pages            Folder to look for pages (default to <src>/pages)
 		--src-templates        Folder to look for templates (defaults to <src>/templates)
-		--src-statics          Folder to look for static files (defaults to <src>/statics)
+		--src-statics          Folder to look for static files (defaults to <src>/statics). Repeat for mulitple sources.
 		--src-helpers          Folder to look for helper functions (defaults to <src>/helpers)
 		--dest                 Destination folder (defaults to dist)
 		--dest-statics         Folder to write statics (defaults to <dest>/statics)
@@ -30,6 +30,10 @@ const cli = meow(`
 		--css-variables        Enable support for css-variables
 		--template-import='<file-or-node-module-path>[:<namespace>]'
 		                       Imports the react-components from the given path at the given namespace
+
+	Examples
+		$ schlump # Execute with default
+		$ schlump --src-statics=./statics-one --src-statics=./statics-two
 `, {
 	alias: {
 		h: 'help'

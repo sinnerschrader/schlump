@@ -40,29 +40,32 @@ The result is written into the dist folder.
 ## Usage
 
 ```shell
-./node_modules/.bin/schlump --help
+$ schlump
 
-    Usage
-        $ schlump
+Usage
+  $ schlump [options]
 
-    Options
+Options
 
-        --help, -h             Usage information
-        --src                  Source folder (defaults to src)
-        --src-pages            Folder to look for pages (default to <src>/pages)
-        --src-templates        Folder to look for templates (defaults to <src>/templates)
-        --src-statics          Folder to look for static files (defaults to <src>/statics)
-        --src-helpers          Folder to look for helper functions (defaults to <src>/helpers)
-        --dest                 Destination folder (defaults to dist)
-        --dest-statics         Folder to write statics (defaults to <dest>/statics)
-        --var.<name>=<value>   Define global properties which are usable during build pages
-        --disable-validation   Disable html validation (no link and resource checking)
-        --redirect-map         A json file with key value pairs of url-path (source) and full qualifed urls (target)
-        --scoped-css           Path of the file to write all scoped css to
-        --css-variables        Enable support for css-variables
-        --template-import='<file-or-node-module-path>[:<namespace>]'
-                               Imports the react-components from the given path at the given namespace
+  --help, -h             Usage information
+  --src                  Source folder (defaults to src)
+  --src-pages            Folder to look for pages (default to <src>/pages)
+  --src-templates        Folder to look for templates (defaults to <src>/templates)
+  --src-statics          Folder to look for static files (defaults to <src>/statics). Repeat for mulitple sources.
+  --src-helpers          Folder to look for helper functions (defaults to <src>/helpers)
+  --dest                 Destination folder (defaults to dist)
+  --dest-statics         Folder to write statics (defaults to <dest>/statics)
+  --var.<name>=<value>   Define global properties which are usable during build pages
+  --disable-validation   Disable html validation (no link and resource checking)
+  --redirect-map         A json file with key value pairs of url-path (source) and full qualifed urls (target)
+  --scoped-css           Path of the file to write all scoped css to
+  --css-variables        Enable support for css-variables
+  --template-import='<file-or-node-module-path>[:<namespace>]'
+                         Imports the react-components from the given path at the given namespace
 
+Examples
+  $ schlump # Execute with default
+  $ schlump --src-statics=./statics-one --src-statics=./statics-two
 ```
 
 ## Pages
@@ -201,7 +204,7 @@ h1 + p {
 
 ## Template Imports
 
-With the option `--template-import` it is possible to integrate external [React](https://reactjs.com) 
+With the option `--template-import` it is possible to integrate external [React](https://reactjs.com)
 libraries (e.g. [elemental ui](http://elemental-ui.com/)) into schlump sites.
 
 The libraries are either referenced from node_modules (e.g. `elemental`) or by relative path
