@@ -177,7 +177,7 @@ test('createScopedCss should replace descendant CSS selectors with a prefixed-ha
 		</style>
 	`;
 	const expected = stripIndent`
-	.name--571293890-selector .name--571293890-descendant {
+	.name--571293890-selector .name--571293890-tdescendant {
 	  declaration: value;
 	}
 	`;
@@ -198,7 +198,7 @@ test('createScopedCss should return a selector mapping for descendant CSS select
 	const expected = {
 	};
 	const expectedMapping = {
-		'.selector descendant': 'name--571293890-descendant'
+		'.selector descendant': 'name--571293890-tdescendant'
 	};
 
 	const [actual,,, mapping] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);

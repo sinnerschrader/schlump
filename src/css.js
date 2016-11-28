@@ -130,7 +130,7 @@ function selectorTransform(ns) {
 				}
 				if (selector.last.type === selectorParser.TAG) {
 					selector.last.replaceWith(selectorParser.className({value:
-						`${ns}-${selector.last.value}`}));
+						`${ns}-t${selector.last.value}`}));
 					map[sourceSelector] = String(selector.last).replace(/^\./, '');
 				}
 			});
