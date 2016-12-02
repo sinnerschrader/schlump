@@ -32,7 +32,7 @@ function getMarkup(code) {
  * @param {Object|string} scope Namespace for generated classNames
  * @param {string?} filepath Input file path (mainly for debugging)
  * @param {boolean} cssVariables True if css-variables support should be enabled
- * @returns [html: string, CSSOM: {classNames: any, vars: any}, css: string]
+ * @returns [html: string, CSSOM: {classNames: any, vars: any}, css: string, transformMap: Object]
  */
 function createScopedCss(html, scope, filepath, cssVariables) {
 	scope = typeof scope === 'string' ? {ns: scope, vars: new Map()} : scope;
@@ -116,6 +116,11 @@ function selectorTransform(ns) {
 		fn: selectors => {
 			selectors.each(selector => {
 				const sourceSelector = String(selector);
+				if (selector.nodes.length === 1 && selector.first.type === selectorParser.PSEUDO &&
+						selector.first.value === ':root') {
+					selector.first.replaceWith(selectorParser.className({value: `${ns}-root`}));
+					map[sourceSelector] = String(`${ns}-root`).replace(/^\./, '');
+				}
 				for (let i = 0, n = selector.nodes.length; i < n; i++) {
 					if (selector.nodes[i].type === selectorParser.CLASS) {
 						selector.nodes[i].replaceWith(selectorParser.className({value:

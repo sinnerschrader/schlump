@@ -286,3 +286,26 @@ test('createScopedCss should prefix attribute selectors with classname', t => {
 	t.deepEqual(actualStyle, expectedStyle);
 	t.deepEqual(actualMapping, expectedMapping);
 });
+
+test('createScopedCss should ', t => {
+	const input = stripIndent`
+		<style scoped>
+			:root {
+				declaration: value;
+			}
+		</style>
+	`;
+	const expectedCss = stripIndent`
+	.name--500756630-root {
+	  declaration: value;
+	}
+	`;
+	const expectedMapping = {
+		':root': 'name--500756630-root'
+	};
+
+	const [,, actualCss, actualMapping] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);
+
+	t.deepEqual(actualCss, expectedCss);
+	t.deepEqual(actualMapping, expectedMapping);
+});

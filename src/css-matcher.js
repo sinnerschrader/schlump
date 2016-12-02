@@ -149,6 +149,11 @@ class CssMatcher {
 			case selectorParser.ATTRIBUTE:
 				return this.findMatchingSibling(node, node => this.isAttributeMatching(node));
 			case selectorParser.PSEUDO:
+				if (node.value === ':root') {
+					this.toParent();
+					this.updateCurrentSiblings();
+					return Object.keys(this.currentNode).length === 0;
+				}
 				return true;
 			default:
 				return false;

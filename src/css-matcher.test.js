@@ -190,3 +190,23 @@ test('getMatchingSelectors return matching attribute with pseudo selectors', t =
 
 	t.deepEqual(actual, expected);
 });
+
+test('getMatchingSelectors return matching :root selector', t => {
+	const input = [':root'];
+	const expected = [':root'];
+	const domStack = [{tag: 'div'}];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
+
+test('getMatchingSelectors does not match :root selector', t => {
+	const input = [':root'];
+	const expected = [];
+	const domStack = [[{tag: 'div'}], [{tag: 'div'}]];
+
+	const actual = getMatchingSelectors(domStack, input);
+
+	t.deepEqual(actual, expected);
+});
