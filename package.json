@@ -82,7 +82,7 @@
     "nyc": "^10.0.0",
     "react-addons-css-transition-group": "^15.3.2",
     "rimraf": "^2.5.4",
-    "standard-version": "^3.0.0",
+    "standard-version": "^4.0.0",
     "xo": "^0.17.0"
   },
   "config": {
