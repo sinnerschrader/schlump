@@ -1,9 +1,9 @@
-.layout-1746083376-root {
+.layout--716416844-root {
   --main-red: rgb(238, 29, 35);
   --main-yellow: rgb(255, 220, 1);}
-.my-component-100140932-colored {
+.my-component-429226565-colored {
   color: rgb(238, 29, 35);}
-.site-pages-index2-html--469062578-second-page {
+.site-pages-index2-html--1193124503-second-page {
   /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fcecfc+0,fba6e1+50,fd89d7+51,ff7cd8+100;Pink+Gloss+%232 */
   background: rgb(252,236,252);
   /* Old browsers */
@@ -17,15 +17,15 @@
   /* IE6-9 */}
 /* comment */
 
-.with-style-255329289-styled-container {
+.with-style-488397811-styled-container {
   --main-red: blue;
   border: 1px solid darkgreen;
   background-color: rgb(255, 220, 1);}
-.with-style-255329289-styled-container .with-style-255329289-th2 {
+.with-style-488397811-styled-container .with-style--1880451103-h2 {
   font-weight: bold;}
-h2 + .with-style-255329289-tp {
+h2 + .with-style--593106633-p {
   margin: 50px;}
-.with-style-255329289[data-theme] {
+.with-style-1208472336[data-theme] {
   border: 1px solid deeppink;}
-.my-component--727887898-colored {
+.my-component-188419491-colored {
   color: blue;}
