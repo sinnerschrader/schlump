@@ -1,0 +1,29 @@
+---
+title: Schlump!
+route: /index3.html
+---
+<style scoped>
+div {
+	--color: red;
+}
+section {
+	--color: green;
+}
+p {
+	color: var(--color);
+}
+@media (min-width: 600px) {
+	div {
+		--color: blue;
+	}
+}</style>
+<Layout {...frontmatter} base=".">
+	<div>
+		<p>Hello World (in blue if > 600px)</p>
+		<section>
+			<p>Hello World (green)</p>
+			Hello World (black)
+		</section>
+	</div>
+	<a href="./index.html">Link to page 1</a>
+</Layout>

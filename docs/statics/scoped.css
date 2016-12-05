@@ -29,3 +29,13 @@ h2 + .with-style--593106633-p {
   border: 1px solid deeppink;}
 .my-component-188419491-colored {
   color: blue;}
+.site-pages-index3-html--786625592-div {
+  --color: red;}
+.site-pages-index3-html--42717062-section {
+  --color: green;}
+.site-pages-index3-html-1550818010-p {
+  color: green;}
+@media (min-width: 600px) {
+  div {
+    --color: blue;}
+}
