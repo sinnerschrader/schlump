@@ -74,7 +74,7 @@ test('createScopedCss should replace CSS vars with values from given scope', t =
 		</style>
 	`;
 	const expected = stripIndent`
-		.name-962618004-selector {
+		.name--1730628018-selector {
 		  --first-variable: red;
 		  color: red;
 		  background-color: blue;
@@ -137,7 +137,7 @@ test('createScopedCss should replace simple CSS selectors with a prefixed-hashed
 		</style>
 	`;
 	const expected = stripIndent`
-	.name--1044404709-selector {
+	.name-1162567505-selector {
 	  declaration: value;
 	}
 	`;
@@ -156,10 +156,10 @@ test('createScopedCss should return a selector mapping for simple CSS selectors'
 		</style>
 	`;
 	const expected = {
-		selector: 'name--1044404709-selector'
+		selector: 'name-1162567505-selector'
 	};
 	const expectedMapping = {
-		'.selector': 'name--1044404709-selector'
+		'.selector': 'name-1162567505-selector'
 	};
 
 	const [actual,,, mapping] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);
@@ -177,7 +177,7 @@ test('createScopedCss should replace descendant CSS selectors with a prefixed-ha
 		</style>
 	`;
 	const expected = stripIndent`
-	.name--571293890-selector .name--571293890-tdescendant {
+	.name-1162567505-selector .name-1162567505-descendant {
 	  declaration: value;
 	}
 	`;
@@ -198,7 +198,7 @@ test('createScopedCss should return a selector mapping for descendant CSS select
 	const expected = {
 	};
 	const expectedMapping = {
-		'.selector descendant': 'name--571293890-tdescendant'
+		'.selector descendant': 'name-1162567505-descendant'
 	};
 
 	const [actual,,, mapping] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);
@@ -220,7 +220,7 @@ test('createScopedCss should resolve variable values recursivly', t => {
 		['--name', 'var(--other)']
 	]);
 	const expected = stripIndent`
-	.name--1044404709-selector {
+	.name-1162567505-selector {
 	  declaration: value;
 	}
 	`;
@@ -239,10 +239,10 @@ test('createScopedCss should handle pseudo-classes correct', t => {
 		</style>
 	`;
 	const expectedClasses = {
-		selector: 'name-1092746841-selector'
+		selector: 'name-1162567505-selector'
 	};
 	const expectedStyle = stripIndent`
-	.name-1092746841-selector:pseudo {
+	.name-1162567505-selector:pseudo {
 	  declaration: value;
 	}
 	`;
@@ -267,17 +267,17 @@ test('createScopedCss should prefix attribute selectors with classname', t => {
 	const expectedClasses = {
 	};
 	const expectedStyle = stripIndent`
-	.name--192375069[data-attr] {
+	.name-1162567505[data-attr] {
 	  declaration: value;
 	}
 
-	selector .name--192375069[data-attr] {
+	selector .name-1162567505[data-attr] {
 	  declaration: value;
 	}
 	`;
 	const expectedMapping = {
-		'[data-attr]': 'name--192375069',
-		'selector [data-attr]': 'name--192375069'
+		'[data-attr]': 'name-1162567505',
+		'selector [data-attr]': 'name-1162567505'
 	};
 
 	const [actualClasses,, actualStyle, actualMapping] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);
@@ -287,7 +287,7 @@ test('createScopedCss should prefix attribute selectors with classname', t => {
 	t.deepEqual(actualMapping, expectedMapping);
 });
 
-test('createScopedCss should ', t => {
+test('createScopedCss should create mappings for pseudo-root selector', t => {
 	const input = stripIndent`
 		<style scoped>
 			:root {
@@ -296,12 +296,12 @@ test('createScopedCss should ', t => {
 		</style>
 	`;
 	const expectedCss = stripIndent`
-	.name--500756630-root {
+	.name-1162567505-root {
 	  declaration: value;
 	}
 	`;
 	const expectedMapping = {
-		':root': 'name--500756630-root'
+		':root': 'name-1162567505-root'
 	};
 
 	const [,, actualCss, actualMapping] = createScopedCss(input, {ns: 'name', vars: new Map()}, 'file', true);

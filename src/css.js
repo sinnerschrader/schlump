@@ -32,7 +32,7 @@ function getMarkup(code) {
  * @param {Object|string} scope Namespace for generated classNames
  * @param {string?} filepath Input file path (mainly for debugging)
  * @param {boolean} cssVariables True if css-variables support should be enabled
- * @returns [html: string, CSSOM: {classNames: any, vars: any}, css: string, transformMap: Object]
+ * @returns [classNames: any, vars: any, css: string, transformMap: Object]
  */
 function createScopedCss(html, scope, filepath, cssVariables) {
 	scope = typeof scope === 'string' ? {ns: scope, vars: new Map()} : scope;
@@ -48,12 +48,9 @@ function createScopedCss(html, scope, filepath, cssVariables) {
 	if (cssVariables) {
 		resolveScopeVariables(cssom, vars);
 	}
-	const hash = createHash(css.stringify(cssom));
-	const ns = `${decamelize(scope.ns, '-')}-${hash}`;
-	const classNames = getClassNames(ns, cssom);
-	const transformMap = rewriteSelectors(ns, cssom);
+	const [classes, transformMap] = rewriteSelectors(`${decamelize(scope.ns, '-')}`, cssom);
 
-	return [classNames, vars, css.stringify(cssom), transformMap];
+	return [classes, vars, css.stringify(cssom), transformMap];
 }
 
 // Based on http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
@@ -89,70 +86,94 @@ function combineCss(templates, scopedCss) {
 	.join('\n').trim();
 }
 
-function getClassNames(ns, cssom) {
-	return cssom.stylesheet.rules
-		.filter(rule => rule.type === 'rule')
-		.reduce((selectors, rule) => [...selectors, ...rule.selectors], [])
-		.reduce((classNames, selector) => {
-			const transform = selectors => {
+function isClassSelectorNode(selector, i) {
+	return selector.nodes[i].type === selectorParser.CLASS;
+}
+function isClassWithAttributeSelectorNode(selector, i) {
+	return selector.nodes[i].type === selectorParser.ATTRIBUTE &&
+		(i === 0 || selector.nodes[i - 1].type !== selectorParser.CLASS);
+}
+function isSimpleClassSelector(selector) {
+	return selector.nodes.length === 1 && selector.nodes[0].type === selectorParser.CLASS;
+}
+function isSimpleClassWithPseudoSelector(selector) {
+	return selector.nodes.length === 2 && selector.nodes[0].type === selectorParser.CLASS &&
+		selector.nodes[1].type === selectorParser.PSEUDO;
+}
+function isOnlyPseudoRootSelector(selector) {
+	return selector.nodes.length === 1 && selector.first.type === selectorParser.PSEUDO &&
+		selector.first.value === ':root';
+}
+
+function createHashFromRule(nsPrefix, rule) {
+	const ruleBody = rule.declarations
+		.map(declaration => `${declaration.property}: ${declaration.value}`)
+		.join('\n');
+	return `${nsPrefix}-${createHash(ruleBody)}`;
+}
+
+function selectorTransformFactory(nsPrefix) {
+	const classNameCache = new Map();
+	const classes = {};
+	const map = {};
+
+	return {
+		classes,
+		map,
+		createTransform(rule) {
+			const ns = createHashFromRule(nsPrefix, rule);
+			return selectors => {
 				selectors.each(selector => {
-					if ((selector.nodes.length === 1 && selector.nodes[0].type === selectorParser.CLASS)) {
-						classNames[camelcase(String(selector))] = `${ns}-${selector.nodes[0].value}`;
-					} else if (selector.nodes.length === 2 && selector.nodes[0].type === selectorParser.CLASS &&
-							selector.nodes[1].type === selectorParser.PSEUDO) {
-						classNames[camelcase(String(selector.nodes[0].value))] = `${ns}-${selector.nodes[0].value}`;
+					const sourceSelector = String(selector);
+
+					if (isSimpleClassSelector(selector)) {
+						classes[camelcase(String(selector))] = `${ns}-${selector.nodes[0].value}`;
+					} else if (isSimpleClassWithPseudoSelector(selector)) {
+						classes[camelcase(String(selector.nodes[0].value))] = `${ns}-${selector.nodes[0].value}`;
+					}
+
+					if (isOnlyPseudoRootSelector(selector)) {
+						selector.first.replaceWith(selectorParser.className({value: `${ns}-root`}));
+						map[sourceSelector] = String(`${ns}-root`).replace(/^\./, '');
+					} else {
+						for (let i = 0, n = selector.nodes.length; i < n; i++) {
+							if (isClassSelectorNode(selector, i)) {
+								let newClass = classNameCache.get(selector.nodes[i].value);
+								if (!newClass) {
+									newClass = selectorParser.className({value: `${ns}-${selector.nodes[i].value}`});
+									classNameCache.set(selector.nodes[i].value, newClass);
+								}
+								selector.nodes[i].replaceWith(newClass);
+								map[sourceSelector] = String(selector.last).replace(/^\./, '');
+							} else if (isClassWithAttributeSelectorNode(selector, i)) {
+								const classSelector = selectorParser.className({value: ns});
+								selector.insertBefore(selector.nodes[i], classSelector);
+								map[sourceSelector] = String(classSelector).replace(/^\./, '');
+							}
+						}
+						if (selector.last.type === selectorParser.TAG) {
+							selector.last.replaceWith(selectorParser.className({value:
+								`${ns}-${selector.last.value}`}));
+							map[sourceSelector] = String(selector.last).replace(/^\./, '');
+						}
 					}
 				});
 			};
-			selectorParser(transform).process(selector);
-			return classNames;
-		}, {});
-}
-
-function selectorTransform(ns) {
-	const map = {};
-	return {
-		map,
-		fn: selectors => {
-			selectors.each(selector => {
-				const sourceSelector = String(selector);
-				if (selector.nodes.length === 1 && selector.first.type === selectorParser.PSEUDO &&
-						selector.first.value === ':root') {
-					selector.first.replaceWith(selectorParser.className({value: `${ns}-root`}));
-					map[sourceSelector] = String(`${ns}-root`).replace(/^\./, '');
-				}
-				for (let i = 0, n = selector.nodes.length; i < n; i++) {
-					if (selector.nodes[i].type === selectorParser.CLASS) {
-						selector.nodes[i].replaceWith(selectorParser.className({value:
-							`${ns}-${selector.nodes[i].value}`}));
-						map[sourceSelector] = String(selector.last).replace(/^\./, '');
-					} else if (selector.nodes[i].type === selectorParser.ATTRIBUTE &&
-							(i === 0 || selector.nodes[i - 1].type !== selectorParser.CLASS)) {
-						const classSelector = selectorParser.className({value: ns});
-						selector.insertBefore(selector.nodes[i], classSelector);
-						map[sourceSelector] = String(classSelector).replace(/^\./, '');
-					}
-				}
-				if (selector.last.type === selectorParser.TAG) {
-					selector.last.replaceWith(selectorParser.className({value:
-						`${ns}-t${selector.last.value}`}));
-					map[sourceSelector] = String(selector.last).replace(/^\./, '');
-				}
-			});
 		}
 	};
 }
 
 function rewriteSelectors(ns, cssom) {
-	const transform = selectorTransform(ns);
+	const factory = selectorTransformFactory(ns);
 	cssom.stylesheet.rules
 		.filter(rule => rule.type === 'rule')
 		.forEach(rule => {
+			const transform = factory.createTransform(rule);
 			rule.selectors = rule.selectors
 				.map(selector =>
-					selectorParser(transform.fn).process(selector).result);
+					selectorParser(transform).process(selector).result);
 		});
-	return transform.map;
+	return [factory.classes, factory.map];
 }
 
 function getDeclarations(cssom) {

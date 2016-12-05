@@ -14,9 +14,9 @@ route: /index2.html
 </style>
 <Layout {...frontmatter} base=".">
 	<div className={style.secondPage}>
-		<MyComponent message={'foo=' + props.foo}/>
+		<MyComponent message={'foo=' + props.foo + ' should be red'}/>
 		<WithStyle/>
-		<MyComponent message={'foo2=' + props.foo}/>
+		<MyComponent message={'foo2=' + props.foo + ' should be red'}/>
 	</div>
 	<a href="./index.html">Link to page 1</a>
 </Layout>
