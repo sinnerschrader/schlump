@@ -1,5 +1,7 @@
 # schlump
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/sinnerschrader/schlump.svg)](https://greenkeeper.io/)
+
 [![license](https://img.shields.io/github/license/sinnerschrader/schlump.svg)](https://github.com/sinnerschrader/schlump/blob/master/LICENSE)
 [![npm](https://img.shields.io/npm/v/schlump.svg)](https://www.npmjs.com/package/schlump)
 [![Build Status](https://travis-ci.org/sinnerschrader/schlump.svg?branch=master)](https://travis-ci.org/sinnerschrader/schlump)
