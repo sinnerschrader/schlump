@@ -83,7 +83,7 @@
     "react-addons-css-transition-group": "^15.3.2",
     "rimraf": "^2.5.4",
     "standard-version": "^4.0.0",
-    "xo": "^0.17.0"
+    "xo": "^0.18.0"
   },
   "config": {
     "commitizen": {
