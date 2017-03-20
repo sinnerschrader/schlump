@@ -22,18 +22,18 @@ class CssMatcher {
 	}
 
 	resetState() {
-		// could be 'current' or 'any'
+		// Could be 'current' or 'any'
 		this.siblingMatchMode = 'current';
 		this.parentMatchMode = 'current';
 	}
 
 	updateCurrentSiblings() {
-		// no localStack => no siblings
+		// No localStack => no siblings
 		if (!this.domStack) {
 			this.siblings = undefined;
 			return;
 		}
-		// stack structure: [[parents], [siblings]]
+		// Stack structure: [[parents], [siblings]]
 		if (this.domStack.length > 0 && Array.isArray(this.domStack[0])) {
 			[, this.siblings] = this.domStack;
 		} else {

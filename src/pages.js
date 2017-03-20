@@ -9,7 +9,7 @@ const figures = require('figures');
 const {oneLine} = require('common-tags');
 const camelcase = require('camelcase');
 const uppercaseFirst = require('upper-case-first');
-var beautifyHtml = require('js-beautify').html;
+const beautifyHtml = require('js-beautify').html;
 
 const {validatePages} = require('./validator');
 const {createReactComponent} = require('./templates');
@@ -103,10 +103,10 @@ function createDecoratedRootComponent(Page, cssScope, cssParts) {
 		getChildContext() {
 			return {
 				scope: {
-					get: function () {
+					get() {
 						return cssScope;
 					},
-					set: function (newScope) {
+					set(newScope) {
 						cssScope = newScope;
 					},
 					css: css => {

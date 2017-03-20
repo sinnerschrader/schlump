@@ -99,15 +99,15 @@ function setupSandbox(templates, sandboxExtras, jsxHelpers, getLocalStyle) {
 		/*
 		 * Trap property resolution
 		 */
-		get: function (target, name) {
+		get(target, name) {
 			// Check if we have a component with this name
 			if (templates[name]) {
 				return templates[name];
 			}
-			// monkey-patch React.createElement
+			// Monkey-patch React.createElement
 			if (name === 'React') {
 				return new Proxy(React, {
-					get: function (target, name) {
+					get(target, name) {
 						if (name === 'createElement') {
 							return createElementFactory(proxyTarget);
 						}
@@ -135,8 +135,8 @@ function contextStackFactory(SFC) {
 	class ContextStack extends React.Component {
 		getChildContext() {
 			return {
-				/*
-				 * css-vars scope
+				/**
+				 * Css-vars scope
 				 *
 				 * Used to track the variable scope over pages/templates
 				 */
@@ -154,8 +154,8 @@ function contextStackFactory(SFC) {
 						this.context.scope.css(css);
 					}
 				},
-				/*
-				 * dom-stack
+				/**
+				 * Dom-stack
 				 *
 				 * Used to track the DOM per page/template to apply css selectors
 				 */
