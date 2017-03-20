@@ -13,7 +13,9 @@ module.exports = {
 function createElementFactory(sandbox) {
 	let reverseCssMapping;
 	const getReverseCssMapping = () => {
+		// eslint:disable capitalized-comments
 		// sandbox.cssMapping is {[classname]: hashed-classname}
+		// eslint:disable capitalized-comments
 		// this reverses to {[hashed-classname]: classname}
 		if (!reverseCssMapping) {
 			reverseCssMapping = Object.keys(sandbox.cssMapping)
@@ -93,7 +95,7 @@ function createElementFactory(sandbox) {
 				}
 
 				render() {
-					// note: this calls have side effects - call order matters
+					// Note: this calls have side effects - call order matters
 					const currentNode = {tag: tagOrComponent, attrs: props};
 					this.context.stack.push(currentNode);
 					props = this.processCssMappings(props, currentNode);
