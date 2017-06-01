@@ -79,7 +79,7 @@
     "husky": "^0.13.1",
     "less": "^2.7.1",
     "less-plugin-clean-css": "^1.5.1",
-    "nyc": "^10.0.0",
+    "nyc": "^11.0.1",
     "react-addons-css-transition-group": "^15.3.2",
     "rimraf": "^2.5.4",
     "standard-version": "^4.0.0",
