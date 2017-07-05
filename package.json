@@ -76,7 +76,7 @@
     "conventional-changelog-lint": "^1.0.1",
     "cz-customizable": "^5.0.0",
     "elemental": "^0.6.1",
-    "husky": "^0.13.1",
+    "husky": "^0.14.3",
     "less": "^2.7.1",
     "less-plugin-clean-css": "^1.5.1",
     "nyc": "^10.0.0",
