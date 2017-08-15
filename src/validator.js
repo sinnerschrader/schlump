@@ -34,6 +34,7 @@ function extendPath(filepath) {
 function checkAnchor(dom, sourcefile, destinationPath, files) {
 	const validatableAnchor = anchor =>
 		!anchor.attribs.href.startsWith('#') &&
+		!anchor.attribs.href.startsWith('/#') &&
 		!anchor.attribs.href.startsWith('http://') &&
 		!anchor.attribs.href.startsWith('https://') &&
 		!anchor.attribs.href.startsWith('mailto:');
