@@ -55,7 +55,7 @@
     "decamelize": "^1.2.0",
     "figures": "^2.0.0",
     "globby": "^6.0.0",
-    "gray-matter": "^2.0.2",
+    "gray-matter": "^3.0.6",
     "htmlparser": "^1.7.7",
     "js-beautify": "^1.6.4",
     "meow": "^3.7.0",
