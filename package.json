@@ -57,7 +57,7 @@
     "globby": "^6.0.0",
     "gray-matter": "^2.0.2",
     "htmlparser": "^1.7.7",
-    "js-beautify": "^1.6.4",
+    "js-beautify": "^1.7.2",
     "meow": "^3.7.0",
     "postcss-selector-parser": "^2.2.2",
     "react": "^15.3.2",
