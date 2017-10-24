@@ -71,7 +71,7 @@
     "upper-case-first": "^1.1.2"
   },
   "devDependencies": {
-    "ava": "^0.19.0",
+    "ava": "^0.23.0",
     "chokidar-cli": "^1.2.0",
     "conventional-changelog-lint": "^1.0.1",
     "cz-customizable": "^5.0.0",
